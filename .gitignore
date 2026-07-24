@@ -60,3 +60,6 @@ next-env.d.ts
 /data/*.mjs
 /data/*.js
 /data/package*.json
+
+/data/maps-scrape*.png
+/data/*-scrape*.png
