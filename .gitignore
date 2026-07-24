@@ -53,3 +53,10 @@ next-env.d.ts
 
 # keep WhatsApp-named originals out of git if duplicated under images/fleet
 # (clean copies live in public/images/fleet)
+
+# scrape / local tooling under data
+/data/node_modules/
+/data/*.html
+/data/*.mjs
+/data/*.js
+/data/package*.json
