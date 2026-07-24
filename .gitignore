@@ -39,3 +39,17 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local data & uploads
+/data/*.json
+/data/*.txt
+/Im1.jpg
+/public/uploads/gallery/*
+/public/uploads/fleet/*
+/public/uploads/destinations/*
+!/public/uploads/gallery/.gitkeep
+!/public/uploads/fleet/.gitkeep
+!/public/uploads/destinations/.gitkeep
+
+# keep WhatsApp-named originals out of git if duplicated under images/fleet
+# (clean copies live in public/images/fleet)

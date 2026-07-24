@@ -1,26 +1,138 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --jungle: #0c3326;
+  --leaf: #1a6b4a;
+  --lagoon: #0e7c7b;
+  --gold: #d4a017;
+  --sun: #f0b429;
+  --mist: #eef5f1;
+  --foam: #f7fbf9;
+  --ink: #0b1f18;
+  --muted: #4d6359;
+  --line: #d5e3db;
+  --whatsapp: #25d366;
+  --background: var(--foam);
+  --foreground: var(--ink);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-jungle: var(--jungle);
+  --color-leaf: var(--leaf);
+  --color-lagoon: var(--lagoon);
+  --color-gold: var(--gold);
+  --color-sun: var(--sun);
+  --color-mist: var(--mist);
+  --color-foam: var(--foam);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-whatsapp: var(--whatsapp);
+  --font-display: var(--font-fraunces);
+  --font-sans: var(--font-manrope);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--lagoon) 35%, white);
+  color: var(--ink);
+}
+
+.font-display {
+  font-family: var(--font-fraunces), Georgia, serif;
+}
+
+.bg-island {
+  background:
+    radial-gradient(ellipse 80% 50% at 10% -10%, rgba(14, 124, 123, 0.18), transparent 55%),
+    radial-gradient(ellipse 60% 40% at 100% 0%, rgba(212, 160, 23, 0.14), transparent 50%),
+    radial-gradient(ellipse 50% 35% at 50% 100%, rgba(26, 107, 74, 0.1), transparent 55%),
+    linear-gradient(180deg, #f7fbf9 0%, #eef5f1 100%);
+}
+
+.bg-jungle-depth {
+  background:
+    linear-gradient(135deg, rgba(12, 51, 38, 0.92), rgba(14, 124, 123, 0.78)),
+    url("/images/hero.jpg") center/cover;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+.reveal {
+  animation: rise 0.8s ease both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float-y {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.float-soft {
+  animation: float-y 5s ease-in-out infinite;
+}
+
+.wa-pulse {
+  animation: wa-pulse 2.2s ease-out infinite;
+}
+
+@keyframes wa-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.55);
+  }
+  70% {
+    box-shadow: 0 0 0 16px rgba(37, 211, 102, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
+  }
+}
+
+.nav-link:hover .nav-underline {
+  transform: scaleX(1);
+}
+
+@keyframes mobile-in {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.mobile-nav-item {
+  animation: mobile-in 0.35s ease both;
 }
