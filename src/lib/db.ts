@@ -59,7 +59,11 @@ export type DestinationRecord = Destination & {
 };
 
 async function ensureDataDir() {
-  await fs.mkdir(DATA_DIR, { recursive: true });
+  try {
+    await fs.mkdir(DATA_DIR, { recursive: true });
+  } catch {
+    // Read-only filesystem (Vercel serverless) — ignore
+  }
 }
 
 async function readJson<T>(file: string, fallback: T): Promise<T> {
@@ -69,18 +73,29 @@ async function readJson<T>(file: string, fallback: T): Promise<T> {
     const raw = await fs.readFile(filePath, "utf8");
     return JSON.parse(raw) as T;
   } catch {
-    await fs.writeFile(filePath, JSON.stringify(fallback, null, 2), "utf8");
+    // Seed files when possible; on Vercel the disk is read-only so just use fallback
+    try {
+      await fs.writeFile(filePath, JSON.stringify(fallback, null, 2), "utf8");
+    } catch {
+      /* no persistent storage on this host */
+    }
     return fallback;
   }
 }
 
 async function writeJson<T>(file: string, data: T) {
   await ensureDataDir();
-  await fs.writeFile(
-    path.join(DATA_DIR, file),
-    JSON.stringify(data, null, 2),
-    "utf8",
-  );
+  try {
+    await fs.writeFile(
+      path.join(DATA_DIR, file),
+      JSON.stringify(data, null, 2),
+      "utf8",
+    );
+  } catch {
+    throw new Error(
+      "File storage is read-only on this host. Use a database for production admin writes.",
+    );
+  }
 }
 
 export async function getBookings() {
