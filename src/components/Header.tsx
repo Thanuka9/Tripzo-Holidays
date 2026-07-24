@@ -110,7 +110,7 @@ export function Header() {
         <button
           type="button"
           className={cn(
-            "grid h-10 w-10 place-items-center rounded-full border transition lg:hidden",
+            "grid h-11 w-11 place-items-center rounded-full border transition lg:hidden",
             scrolled
               ? "border-foam/25 text-foam hover:bg-white/10"
               : "border-line text-jungle hover:bg-mist",

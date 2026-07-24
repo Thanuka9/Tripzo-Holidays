@@ -16,26 +16,26 @@ export default async function FleetPage() {
 
   return (
     <div className="bg-island">
-      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
         <p className="text-sm font-semibold uppercase tracking-[0.2em] text-lagoon">
           Vehicles
         </p>
-        <h1 className="mt-3 font-display text-4xl font-semibold text-jungle sm:text-5xl">
+        <h1 className="mt-3 font-display text-3xl font-semibold text-jungle sm:text-4xl md:text-5xl">
           Our fleet
         </h1>
-        <p className="mt-4 max-w-2xl text-muted">
+        <p className="mt-4 max-w-2xl text-sm text-muted sm:text-base">
           Real Tripzo vehicles — from hybrid sedans to KDH vans and coaches — matched to your
           group size across Sri Lanka.
         </p>
 
-        <div className="mt-12 space-y-14">
+        <div className="mt-10 space-y-10 sm:mt-12 sm:space-y-14">
           {fleet.map((vehicle) => (
             <article
               key={vehicle.id}
               className="overflow-hidden rounded-[1.75rem] border border-line bg-foam shadow-sm"
             >
               <div className="grid lg:grid-cols-[1.15fr_0.85fr]">
-                <div className="relative min-h-[16rem] lg:min-h-[22rem]">
+                <div className="relative min-h-[14rem] sm:min-h-[16rem] lg:min-h-[22rem]">
                   <Image
                     src={vehicle.image}
                     alt={vehicle.name}
@@ -44,8 +44,8 @@ export default async function FleetPage() {
                     sizes="(max-width: 1024px) 100vw, 55vw"
                   />
                 </div>
-                <div className="flex flex-col justify-center p-6 sm:p-8">
-                  <h2 className="font-display text-3xl text-jungle">{vehicle.name}</h2>
+                <div className="flex flex-col justify-center p-5 sm:p-8">
+                  <h2 className="font-display text-2xl text-jungle sm:text-3xl">{vehicle.name}</h2>
                   <p className="mt-1 text-xs font-semibold uppercase tracking-[0.16em] text-lagoon">
                     {vehicle.capacity} · {vehicle.idealFor}
                   </p>
