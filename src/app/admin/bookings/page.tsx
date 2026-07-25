@@ -10,6 +10,7 @@ import {
   Users,
   MapPin,
   Car,
+  Trash2,
 } from "lucide-react";
 import type { Booking, BookingStatus } from "@/lib/db";
 import { BookingCalendar } from "@/components/admin/BookingCalendar";
@@ -51,6 +52,32 @@ export default function AdminBookingsPage() {
     });
     await load();
     setSelected((prev) => (prev?.id === id ? { ...prev, status } : prev));
+  }
+
+  async function removeBooking(id: string) {
+    if (
+      !confirm(
+        "Permanently remove this appointment from the calendar? This cannot be undone.",
+      )
+    ) {
+      return;
+    }
+    const res = await fetch("/api/admin/bookings", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+    if (res.status === 401) {
+      router.push("/admin/login");
+      return;
+    }
+    if (!res.ok) {
+      const data = await res.json();
+      alert(data.error || "Could not delete booking");
+      return;
+    }
+    setSelected(null);
+    await load();
   }
 
   const filtered = useMemo(() => {
@@ -201,7 +228,11 @@ export default function AdminBookingsPage() {
           </div>
 
           {selected ? (
-            <BookingDetail booking={selected} onStatus={updateStatus} />
+            <BookingDetail
+              booking={selected}
+              onStatus={updateStatus}
+              onDelete={removeBooking}
+            />
           ) : (
             <div className="rounded-3xl border border-dashed border-white/15 p-6 text-sm text-zinc-500">
               Select a booking on the calendar or list to view full details.
@@ -239,9 +270,11 @@ function FilterChip({
 function BookingDetail({
   booking,
   onStatus,
+  onDelete,
 }: {
   booking: Booking;
   onStatus: (id: string, status: BookingStatus) => void;
+  onDelete: (id: string) => void;
 }) {
   return (
     <div className="rounded-3xl border border-sun/30 bg-sun/5 p-5">
@@ -322,6 +355,15 @@ function BookingDetail({
       >
         Message on WhatsApp
       </a>
+
+      <button
+        type="button"
+        onClick={() => onDelete(booking.id)}
+        className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full border border-red-400/40 px-4 py-2.5 text-sm font-semibold text-red-300 hover:bg-red-400/10"
+      >
+        <Trash2 className="h-4 w-4" />
+        Remove from calendar
+      </button>
     </div>
   );
 }

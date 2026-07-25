@@ -3,9 +3,11 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { SITE } from "@/lib/constants";
+import { useContact } from "@/components/SiteContactProvider";
 
-const faqs = [
+export function FaqSection() {
+  const contact = useContact();
+  const faqs = [
   {
     q: "Do you offer airport transfers?",
     a: "Yes — private airport pickup and drop anywhere in Sri Lanka, with flight tracking and meet-and-greet on request.",
@@ -20,15 +22,13 @@ const faqs = [
   },
   {
     q: "How do I book or get a quote?",
-    a: `Use the Book page, WhatsApp ${SITE.phoneDisplay}, or email ${SITE.email}. Share dates, travelers, and destinations — we reply quickly.`,
+    a: `Use the Book page, WhatsApp ${contact.phoneDisplay}, or email ${contact.email}. Share dates, travelers, and destinations — we reply quickly.`,
   },
   {
     q: "Where do team trip photos appear?",
     a: "When our cab team uploads photos with guests or at places, they show on the home page under “Real trip moments” and in Gallery → Our trips.",
   },
 ];
-
-export function FaqSection() {
   const [open, setOpen] = useState<number | null>(0);
 
   return (

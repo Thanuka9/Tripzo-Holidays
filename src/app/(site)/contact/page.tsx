@@ -1,13 +1,18 @@
 import type { Metadata } from "next";
 import { Mail, MessageCircle, Phone } from "lucide-react";
 import { SITE, whatsappLink } from "@/lib/constants";
+import { getContactSettings } from "@/lib/db";
 
 export const metadata: Metadata = {
   title: "Contact",
   description: "Contact Tripzo Cabs & Tours by phone, WhatsApp, email, or Messenger.",
 };
 
-export default function ContactPage() {
+export const dynamic = "force-dynamic";
+
+export default async function ContactPage() {
+  const contact = await getContactSettings();
+
   return (
     <div className="bg-island">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
@@ -24,15 +29,15 @@ export default function ContactPage() {
 
         <div className="mt-12 grid gap-5 md:grid-cols-3">
           <a
-            href={`tel:${SITE.phone}`}
+            href={`tel:${contact.phone}`}
             className="rounded-3xl border border-line bg-foam p-6 transition hover:-translate-y-0.5 hover:shadow-md"
           >
             <Phone className="h-6 w-6 text-lagoon" />
             <h2 className="mt-4 font-display text-xl text-jungle">Phone</h2>
-            <p className="mt-2 text-sm text-muted">{SITE.phoneDisplay}</p>
+            <p className="mt-2 text-sm text-muted">{contact.phoneDisplay}</p>
           </a>
           <a
-            href={whatsappLink("Hi Tripzo Holidays!")}
+            href={whatsappLink("Hi Tripzo Holidays!", contact.whatsapp)}
             target="_blank"
             rel="noreferrer"
             className="rounded-3xl border border-line bg-foam p-6 transition hover:-translate-y-0.5 hover:shadow-md"
@@ -40,14 +45,19 @@ export default function ContactPage() {
             <MessageCircle className="h-6 w-6 text-whatsapp" />
             <h2 className="mt-4 font-display text-xl text-jungle">WhatsApp / Messenger</h2>
             <p className="mt-2 text-sm text-muted">{SITE.socialHandle}</p>
+            {contact.messenger && (
+              <p className="mt-1 text-xs text-muted">
+                <span className="underline">Messenger available</span>
+              </p>
+            )}
           </a>
           <a
-            href={`mailto:${SITE.email}`}
+            href={`mailto:${contact.email}`}
             className="rounded-3xl border border-line bg-foam p-6 transition hover:-translate-y-0.5 hover:shadow-md"
           >
             <Mail className="h-6 w-6 text-lagoon" />
             <h2 className="mt-4 font-display text-xl text-jungle">Email</h2>
-            <p className="mt-2 break-all text-sm text-muted">{SITE.email}</p>
+            <p className="mt-2 break-all text-sm text-muted">{contact.email}</p>
           </a>
         </div>
 

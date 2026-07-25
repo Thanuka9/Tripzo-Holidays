@@ -1,9 +1,15 @@
+"use client";
+
 import Link from "next/link";
 import { BrandLogo } from "@/components/BrandLogo";
 import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
-import { SITE, whatsappLink } from "@/lib/constants";
+import { SITE } from "@/lib/constants";
+import { useContact, useWhatsAppLink } from "@/components/SiteContactProvider";
 
 export function Footer() {
+  const contact = useContact();
+  const wa = useWhatsAppLink();
+
   return (
     <footer className="mt-auto border-t border-line bg-jungle text-foam">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-3">
@@ -59,15 +65,15 @@ export function Footer() {
           <ul className="mt-4 space-y-3 text-sm text-foam/85">
             <li className="flex items-center gap-2">
               <Phone className="h-4 w-4 text-sun" />
-              <a href={`tel:${SITE.phone}`}>{SITE.phoneDisplay}</a>
+              <a href={`tel:${contact.phone}`}>{contact.phoneDisplay}</a>
             </li>
             <li className="flex items-center gap-2">
               <Mail className="h-4 w-4 text-sun" />
-              <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+              <a href={`mailto:${contact.email}`}>{contact.email}</a>
             </li>
             <li className="flex items-center gap-2">
               <MessageCircle className="h-4 w-4 text-sun" />
-              <a href={whatsappLink()} target="_blank" rel="noreferrer">
+              <a href={wa()} target="_blank" rel="noreferrer">
                 WhatsApp · {SITE.socialHandle}
               </a>
             </li>

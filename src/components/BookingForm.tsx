@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { tours } from "@/lib/tours";
 import { defaultFleet } from "@/lib/fleet";
-import { whatsappLink } from "@/lib/constants";
+import { useWhatsAppLink } from "@/components/SiteContactProvider";
 
 type Props = {
   defaultTour?: string;
@@ -14,6 +14,7 @@ type Props = {
 
 export function BookingForm({ defaultTour, compact }: Props) {
   const params = useSearchParams();
+  const wa = useWhatsAppLink();
   const initialTour = defaultTour || params.get("tour") || "";
   const initialVehicle = params.get("vehicle") || "";
   const [pending, setPending] = useState(false);
@@ -58,7 +59,7 @@ export function BookingForm({ defaultTour, compact }: Props) {
           <span className="font-semibold text-jungle">{bookingId.slice(0, 8)}</span>
         </p>
         <a
-          href={whatsappLink(
+          href={wa(
             `Hi Tripzo! I just submitted a booking request (ref ${bookingId.slice(0, 8)}). Looking forward to hearing from you.`,
           )}
           target="_blank"

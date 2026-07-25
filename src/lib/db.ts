@@ -24,6 +24,8 @@ export type Booking = {
   status: BookingStatus;
 };
 
+export type GalleryKind = "general" | "team" | "hero";
+
 export type GalleryImage = {
   id: string;
   src: string;
@@ -31,8 +33,19 @@ export type GalleryImage = {
   caption?: string;
   place?: string;
   people?: string;
-  kind?: "general" | "team";
+  kind?: GalleryKind;
+  sortOrder?: number;
+  /** Cover / lead image within its kind (hero, team, or general) */
+  featured?: boolean;
   createdAt: string;
+};
+
+export type ContactSettings = {
+  phone: string;
+  phoneDisplay: string;
+  whatsapp: string;
+  email: string;
+  messenger: string;
 };
 
 export type ReviewStatus = "pending" | "approved" | "hidden";
@@ -208,28 +221,189 @@ export async function updateBookingStatus(id: string, status: BookingStatus) {
   return bookings[idx];
 }
 
+export async function deleteBooking(id: string) {
+  const bookings = await getBookings();
+  const next = bookings.filter((b) => b.id !== id);
+  if (next.length === bookings.length) return null;
+  await writeJson("bookings.json", next);
+  return next;
+}
+
+function sortGallery(items: GalleryImage[]) {
+  return [...items].sort((a, b) => {
+    const ao = a.sortOrder ?? Number.MAX_SAFE_INTEGER;
+    const bo = b.sortOrder ?? Number.MAX_SAFE_INTEGER;
+    if (ao !== bo) return ao - bo;
+    return b.createdAt.localeCompare(a.createdAt);
+  });
+}
+
 export async function getGallery() {
-  return readJson<GalleryImage[]>("gallery.json", []);
+  const gallery = await readJson<GalleryImage[]>("gallery.json", []);
+  return sortGallery(gallery);
 }
 
 export async function addGalleryImage(
-  input: Omit<GalleryImage, "id" | "createdAt">,
+  input: Omit<GalleryImage, "id" | "createdAt" | "sortOrder"> & {
+    sortOrder?: number;
+  },
 ) {
   const gallery = await getGallery();
+  const kindItems = gallery.filter((g) => (g.kind || "general") === (input.kind || "general"));
+  const maxOrder = kindItems.reduce((m, g) => Math.max(m, g.sortOrder ?? -1), -1);
   const image: GalleryImage = {
     ...input,
     id: randomUUID(),
+    sortOrder: input.sortOrder ?? maxOrder + 1,
     createdAt: new Date().toISOString(),
   };
-  gallery.unshift(image);
+  gallery.push(image);
   await writeJson("gallery.json", gallery);
   return image;
+}
+
+export async function updateGalleryImage(
+  id: string,
+  patch: Partial<
+    Pick<
+      GalleryImage,
+      | "title"
+      | "caption"
+      | "place"
+      | "people"
+      | "kind"
+      | "src"
+      | "sortOrder"
+      | "featured"
+    >
+  >,
+) {
+  const gallery = await getGallery();
+  const idx = gallery.findIndex((g) => g.id === id);
+  if (idx === -1) return null;
+  const cleaned = Object.fromEntries(
+    Object.entries(patch).filter(([, value]) => value !== undefined),
+  ) as typeof patch;
+  gallery[idx] = { ...gallery[idx], ...cleaned };
+  await writeJson("gallery.json", gallery);
+  return gallery[idx];
+}
+
+export async function setGalleryMain(id: string) {
+  const gallery = await getGallery();
+  const target = gallery.find((g) => g.id === id);
+  if (!target) return null;
+  const kind = target.kind || "general";
+  const updated = gallery.map((item) => {
+    if ((item.kind || "general") !== kind) return item;
+    return { ...item, featured: item.id === id };
+  });
+  await writeJson("gallery.json", updated);
+  return sortGallery(updated);
+}
+
+export async function reorderGallery(orderedIds: string[]) {
+  const gallery = await getGallery();
+  const orderMap = new Map(orderedIds.map((id, index) => [id, index]));
+  const updated = gallery.map((item) =>
+    orderMap.has(item.id)
+      ? { ...item, sortOrder: orderMap.get(item.id)! }
+      : item,
+  );
+  await writeJson("gallery.json", updated);
+  return sortGallery(updated);
 }
 
 export async function deleteGalleryImage(id: string) {
   const gallery = await getGallery();
   const next = gallery.filter((g) => g.id !== id);
   await writeJson("gallery.json", next);
+  return sortGallery(next);
+}
+
+export async function ensureDefaultHeroSlides() {
+  const { slideshowSlides } = await import("./destinations");
+  const gallery = await getGallery();
+  if (gallery.some((g) => g.kind === "hero")) return gallery;
+
+  const seeded: GalleryImage[] = slideshowSlides.map((s, i) => ({
+    id: `hero-seed-${i + 1}`,
+    src: s.src,
+    title: s.title,
+    caption: s.caption,
+    kind: "hero",
+    sortOrder: i,
+    createdAt: new Date().toISOString(),
+  }));
+  const next = [...seeded, ...gallery];
+  try {
+    await writeJson("gallery.json", next);
+  } catch {
+    return sortGallery(next);
+  }
+  return sortGallery(next);
+}
+
+export async function getHeroSlides() {
+  const gallery = await ensureDefaultHeroSlides();
+  const heroes = gallery.filter((g) => g.kind === "hero");
+  if (heroes.length === 0) {
+    const { slideshowSlides } = await import("./destinations");
+    return slideshowSlides;
+  }
+  const featured = heroes.find((h) => h.featured);
+  const ordered = featured
+    ? [featured, ...heroes.filter((h) => h.id !== featured.id)]
+    : heroes;
+  return ordered.map((h) => ({
+    src: h.src,
+    title: h.title,
+    caption: h.caption || h.place || "",
+  }));
+}
+
+export async function getFeaturedGalleryCover() {
+  const uploads = await getPublicGalleryUploads();
+  const general = uploads.filter((g) => (g.kind || "general") === "general");
+  const team = uploads.filter((g) => g.kind === "team");
+  return (
+    general.find((g) => g.featured) ||
+    team.find((g) => g.featured) ||
+    general[0] ||
+    team[0] ||
+    null
+  );
+}
+
+const defaultContact = (): ContactSettings => ({
+  phone: process.env.NEXT_PUBLIC_PHONE || "+94766493348",
+  phoneDisplay: "076 649 3348",
+  whatsapp: process.env.NEXT_PUBLIC_WHATSAPP || "94766493348",
+  email: process.env.NEXT_PUBLIC_EMAIL || "chathurasamarakoon9@gmail.com",
+  messenger:
+    process.env.NEXT_PUBLIC_MESSENGER || "https://m.me/TripzoHolidays",
+});
+
+export async function getContactSettings(): Promise<ContactSettings> {
+  const stored = await readJson<Partial<ContactSettings>>(
+    "settings.json",
+    {},
+  );
+  return { ...defaultContact(), ...stored };
+}
+
+export async function updateContactSettings(
+  patch: Partial<ContactSettings>,
+): Promise<ContactSettings> {
+  const current = await getContactSettings();
+  const next: ContactSettings = {
+    phone: patch.phone?.trim() || current.phone,
+    phoneDisplay: patch.phoneDisplay?.trim() || current.phoneDisplay,
+    whatsapp: (patch.whatsapp?.trim() || current.whatsapp).replace(/\D/g, ""),
+    email: patch.email?.trim() || current.email,
+    messenger: patch.messenger?.trim() || current.messenger,
+  };
+  await writeJson("settings.json", next);
   return next;
 }
 
@@ -245,9 +419,16 @@ export async function getFleet() {
 export async function upsertFleetVehicle(vehicle: Vehicle) {
   const fleet = await getFleet();
   const idx = fleet.findIndex((v) => v.id === vehicle.id);
+  const existing = idx >= 0 ? fleet[idx] : null;
+  const gallery =
+    vehicle.gallery ??
+    existing?.gallery ??
+    (vehicle.image ? [vehicle.image] : []);
   const record: FleetRecord = {
     ...vehicle,
-    createdAt: idx >= 0 ? fleet[idx].createdAt : new Date().toISOString(),
+    gallery,
+    image: vehicle.image || gallery[0] || existing?.image || "",
+    createdAt: existing?.createdAt || new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
   if (idx >= 0) fleet[idx] = record;
@@ -256,11 +437,67 @@ export async function upsertFleetVehicle(vehicle: Vehicle) {
   return record;
 }
 
+export async function updateFleetGallery(
+  id: string,
+  gallery: string[],
+  mainImage?: string,
+) {
+  const fleet = await getFleet();
+  const idx = fleet.findIndex((v) => v.id === id);
+  if (idx === -1) return null;
+  const nextGallery = gallery.filter(Boolean);
+  const currentMain = fleet[idx].image;
+  const image =
+    (mainImage && nextGallery.includes(mainImage) && mainImage) ||
+    (nextGallery.includes(currentMain) && currentMain) ||
+    nextGallery[0] ||
+    currentMain;
+  fleet[idx] = {
+    ...fleet[idx],
+    gallery: nextGallery,
+    image,
+    updatedAt: new Date().toISOString(),
+  };
+  await writeJson("fleet.json", fleet);
+  return fleet[idx];
+}
+
+export async function addFleetGalleryImage(id: string, src: string) {
+  const fleet = await getFleet();
+  const idx = fleet.findIndex((v) => v.id === id);
+  if (idx === -1) return null;
+  const gallery = [...(fleet[idx].gallery || [fleet[idx].image]), src];
+  fleet[idx] = {
+    ...fleet[idx],
+    gallery,
+    image: fleet[idx].image || src,
+    updatedAt: new Date().toISOString(),
+  };
+  await writeJson("fleet.json", fleet);
+  return fleet[idx];
+}
+
 export async function deleteFleetVehicle(id: string) {
   const fleet = await getFleet();
   const next = fleet.filter((v) => v.id !== id);
   await writeJson("fleet.json", next);
   return next;
+}
+
+export async function reorderFleet(orderedIds: string[]) {
+  const fleet = await getFleet();
+  const byId = new Map(fleet.map((v) => [v.id, v]));
+  const ordered: FleetRecord[] = [];
+  for (const id of orderedIds) {
+    const item = byId.get(id);
+    if (item) {
+      ordered.push(item);
+      byId.delete(id);
+    }
+  }
+  for (const leftover of byId.values()) ordered.push(leftover);
+  await writeJson("fleet.json", ordered);
+  return ordered;
 }
 
 export async function getDestinations() {
@@ -346,5 +583,13 @@ export async function deleteReview(id: string) {
 
 export async function getTeamPhotos() {
   const gallery = await getGallery();
-  return gallery.filter((g) => g.kind === "team");
+  const team = gallery.filter((g) => g.kind === "team");
+  const featured = team.find((g) => g.featured);
+  if (!featured) return team;
+  return [featured, ...team.filter((g) => g.id !== featured.id)];
+}
+
+export async function getPublicGalleryUploads() {
+  const gallery = await getGallery();
+  return gallery.filter((g) => g.kind !== "hero");
 }

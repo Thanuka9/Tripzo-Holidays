@@ -71,20 +71,20 @@ export default async function FleetPage() {
                 </div>
               </div>
 
-              {vehicle.gallery && vehicle.gallery.length > 1 && (
+              {vehicle.gallery && vehicle.gallery.length > 0 && (
                 <div className="border-t border-line bg-mist/30 p-4 sm:p-5">
                   <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-lagoon">
                     More photos
                   </p>
                   <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-5">
-                    {vehicle.gallery.map((src) => (
+                    {vehicle.gallery.map((src, i) => (
                       <div
-                        key={src}
+                        key={`${vehicle.id}-${src}-${i}`}
                         className="relative aspect-[4/3] overflow-hidden rounded-xl"
                       >
                         <Image
                           src={src}
-                          alt={`${vehicle.name} photo`}
+                          alt={`${vehicle.name} photo ${i + 1}`}
                           fill
                           className="object-cover"
                           sizes="200px"

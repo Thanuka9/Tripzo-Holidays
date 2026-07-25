@@ -8,9 +8,16 @@ import {
   Sparkles,
   Clock3,
 } from "lucide-react";
-import { SITE, whatsappLink } from "@/lib/constants";
+import { whatsappLink } from "@/lib/constants";
 import { tours } from "@/lib/tours";
-import { getFleet, getDestinations, getApprovedReviews, getTeamPhotos } from "@/lib/db";
+import {
+  getFleet,
+  getDestinations,
+  getApprovedReviews,
+  getTeamPhotos,
+  getHeroSlides,
+  getContactSettings,
+} from "@/lib/db";
 import { HeroSlideshow } from "@/components/HeroSlideshow";
 import { DestinationsGrid } from "@/components/DestinationsGrid";
 import { ReviewsSection } from "@/components/ReviewsSection";
@@ -45,17 +52,20 @@ const reasons = [
 
 export default async function HomePage() {
   const featured = tours.filter((t) => t.featured).slice(0, 3);
-  const [fleet, destinations, reviews, teamPhotos] = await Promise.all([
-    getFleet(),
-    getDestinations(),
-    getApprovedReviews(),
-    getTeamPhotos(),
-  ]);
+  const [fleet, destinations, reviews, teamPhotos, heroSlides, contact] =
+    await Promise.all([
+      getFleet(),
+      getDestinations(),
+      getApprovedReviews(),
+      getTeamPhotos(),
+      getHeroSlides(),
+      getContactSettings(),
+    ]);
   const featuredPlaces = destinations.filter((d) => d.featured).slice(0, 6);
 
   return (
     <div>
-      <HeroSlideshow />
+      <HeroSlideshow slides={heroSlides} />
 
       <DestinationsGrid destinations={featuredPlaces} />
 
@@ -171,6 +181,7 @@ export default async function HomePage() {
               <a
                 href={whatsappLink(
                   "Hi Tripzo! I'm interested in the 7-Day Sri Lanka Tour Package.",
+                  contact.whatsapp,
                 )}
                 target="_blank"
                 rel="noreferrer"
@@ -254,10 +265,10 @@ export default async function HomePage() {
               Start booking
             </Link>
             <a
-              href={`tel:${SITE.phone}`}
+              href={`tel:${contact.phone}`}
               className="rounded-full border border-foam/40 px-6 py-3 text-sm font-semibold"
             >
-              Call {SITE.phoneDisplay}
+              Call {contact.phoneDisplay}
             </a>
           </div>
         </div>

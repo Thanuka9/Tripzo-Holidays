@@ -18,8 +18,8 @@ export const SITE = {
   chauffeur: "Chathura Bandara",
 } as const;
 
-export function whatsappLink(message?: string) {
-  const base = `https://wa.me/${SITE.whatsapp}`;
+export function whatsappLink(message?: string, whatsapp = SITE.whatsapp) {
+  const base = `https://wa.me/${whatsapp}`;
   if (!message) return base;
   return `${base}?text=${encodeURIComponent(message)}`;
 }

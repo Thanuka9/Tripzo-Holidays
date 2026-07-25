@@ -68,9 +68,9 @@ export default function AdminDashboardClient({
       icon: MessageSquareHeart,
     },
     {
-      label: "Trip photos",
+      label: "Images",
       value: stats.gallery,
-      hint: "Team uploads",
+      hint: "Hero, trips & gallery",
       href: "/admin/gallery",
       icon: Camera,
     },
@@ -179,8 +179,8 @@ export default function AdminDashboardClient({
                 href: "/admin/reviews",
               },
               {
-                title: "Upload trip photos",
-                text: "Pics with guests or at places",
+                title: "Manage images",
+                text: "Hero slides, trip photos, reorder & replace",
                 href: "/admin/gallery",
               },
               {
@@ -192,6 +192,11 @@ export default function AdminDashboardClient({
                 title: "Update fleet photos",
                 text: "Prius, KDH, Coaster, Rosa",
                 href: "/admin/fleet",
+              },
+              {
+                title: "Contact settings",
+                text: "Phone, WhatsApp, email, Messenger",
+                href: "/admin/settings",
               },
             ].map((item) => (
               <Link

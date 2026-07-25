@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Menu, Phone, X } from "lucide-react";
 import { BrandLogo } from "@/components/BrandLogo";
-import { SITE, whatsappLink } from "@/lib/constants";
+import { useContact, useWhatsAppLink } from "@/components/SiteContactProvider";
 import { cn } from "@/lib/utils";
 
 const links = [
@@ -23,6 +23,8 @@ export function Header() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const contact = useContact();
+  const wa = useWhatsAppLink();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16);
@@ -85,14 +87,14 @@ export function Header() {
 
         <div className="hidden items-center gap-3 md:flex">
           <a
-            href={`tel:${SITE.phone}`}
+            href={`tel:${contact.phone}`}
             className={cn(
               "inline-flex items-center gap-2 text-sm font-medium transition-colors",
               scrolled ? "text-foam/90 hover:text-sun" : "text-jungle",
             )}
           >
             <Phone className={cn("h-4 w-4", scrolled ? "text-sun" : "text-lagoon")} />
-            <span className="hidden xl:inline">{SITE.phoneDisplay}</span>
+            <span className="hidden xl:inline">{contact.phoneDisplay}</span>
           </a>
           <Link
             href="/book"
@@ -168,7 +170,7 @@ export function Header() {
             Book now
           </Link>
           <a
-            href={whatsappLink("Hi Tripzo! I would like to inquire about a tour.")}
+            href={wa("Hi Tripzo! I would like to inquire about a tour.")}
             className="rounded-full bg-whatsapp px-4 py-3 text-center text-sm font-semibold text-white"
           >
             WhatsApp us

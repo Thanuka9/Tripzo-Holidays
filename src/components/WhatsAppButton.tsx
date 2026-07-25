@@ -1,16 +1,17 @@
 "use client";
 
 import { MessageCircle } from "lucide-react";
-import { whatsappLink } from "@/lib/constants";
+import { useWhatsAppLink } from "@/components/SiteContactProvider";
 import { usePathname } from "next/navigation";
 
 export function WhatsAppButton() {
   const pathname = usePathname();
+  const wa = useWhatsAppLink();
   if (pathname?.startsWith("/admin")) return null;
 
   return (
     <a
-      href={whatsappLink(
+      href={wa(
         "Hi Tripzo Cabs & Tours! I'd like to book a ride or tour in Sri Lanka.",
       )}
       target="_blank"

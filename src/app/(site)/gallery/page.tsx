@@ -2,7 +2,11 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { Suspense } from "react";
 import { GalleryShowcase } from "@/components/GalleryShowcase";
-import { getGallery } from "@/lib/db";
+import {
+  getContactSettings,
+  getFeaturedGalleryCover,
+  getPublicGalleryUploads,
+} from "@/lib/db";
 import { whatsappLink } from "@/lib/constants";
 
 export const metadata: Metadata = {
@@ -14,15 +18,21 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function GalleryPage() {
-  const uploaded = await getGallery();
+  const [uploaded, contact, cover] = await Promise.all([
+    getPublicGalleryUploads(),
+    getContactSettings(),
+    getFeaturedGalleryCover(),
+  ]);
   const teamCount = uploaded.filter((g) => g.kind === "team").length;
+  const heroSrc = cover?.src || "/images/gallery/gallery-ella.jpg";
+  const heroAlt = cover?.title || "Nine Arch Bridge Ella Sri Lanka";
 
   return (
     <div>
       <section className="relative min-h-[42vh] overflow-hidden">
         <Image
-          src="/images/gallery/gallery-ella.jpg"
-          alt="Nine Arch Bridge Ella Sri Lanka"
+          src={heroSrc}
+          alt={heroAlt}
           fill
           priority
           className="object-cover"
@@ -68,7 +78,10 @@ export default async function GalleryPage() {
               Yala, and the coast to share with you.
             </p>
             <a
-              href={whatsappLink("Hi Tripzo! I loved the gallery — I'd like to plan a tour.")}
+              href={whatsappLink(
+                "Hi Tripzo! I loved the gallery — I'd like to plan a tour.",
+                contact.whatsapp,
+              )}
               target="_blank"
               rel="noreferrer"
               className="mt-6 inline-flex rounded-full bg-sun px-5 py-3 text-sm font-bold text-jungle"
