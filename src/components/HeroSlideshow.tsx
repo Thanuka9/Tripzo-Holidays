@@ -64,8 +64,12 @@ export function HeroSlideshow({
       <div className="absolute inset-0 bg-gradient-to-t from-jungle/80 via-transparent to-jungle/30" />
 
       <div className="relative mx-auto flex min-h-[85vh] max-w-6xl flex-col justify-end px-4 pb-24 pt-24 sm:min-h-[92vh] sm:px-6 sm:pb-20 sm:pt-28">
-        <BrandLogo onDark size="lg" className="mb-2 origin-left scale-[1.2] sm:scale-[1.6]" />
-        <p className="mt-3 text-xs uppercase tracking-[0.28em] text-foam/80 sm:mt-4 sm:text-sm">
+        <BrandLogo
+          onDark
+          size="lg"
+          className="mb-8 origin-left scale-[1.2] sm:mb-12 sm:scale-[1.6]"
+        />
+        <p className="mt-1 text-xs uppercase tracking-[0.28em] text-foam/80 sm:text-sm">
           Sri Lanka · Tours & Transport
         </p>
         <h1 className="mt-4 max-w-2xl font-display text-[1.75rem] font-medium leading-tight text-foam text-balance sm:mt-6 sm:text-4xl md:text-5xl">
