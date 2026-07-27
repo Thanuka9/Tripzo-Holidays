@@ -40,7 +40,7 @@ export default async function ReviewsPage() {
         </div>
       </section>
 
-      <ReviewsSection reviews={reviews} showFormLink={false} />
+      <ReviewsSection reviews={reviews} showFormLink={false} tone="light" />
 
       <section className="px-4 pb-20 sm:px-6">
         <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[1fr_1.05fr]">

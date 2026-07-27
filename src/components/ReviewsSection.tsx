@@ -10,20 +10,24 @@ import { cn } from "@/lib/utils";
 export function ReviewsSection({
   reviews,
   showFormLink = true,
+  tone = "dark",
 }: {
   reviews: Review[];
   showFormLink?: boolean;
+  tone?: "dark" | "light";
 }) {
   const slides = reviews.filter((r) => r.comment?.trim());
   const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const dark = tone === "dark";
 
   useEffect(() => {
-    if (slides.length <= 1) return;
+    if (slides.length <= 1 || paused) return;
     const id = window.setInterval(() => {
       setIndex((i) => (i + 1) % slides.length);
-    }, 5500);
+    }, 6500);
     return () => window.clearInterval(id);
-  }, [slides.length]);
+  }, [slides.length, paused]);
 
   if (slides.length === 0) {
     return (
@@ -49,123 +53,212 @@ export function ReviewsSection({
   }
 
   const current = slides[index];
+  const initials = current.name
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((p) => p[0]?.toUpperCase() || "")
+    .join("");
 
   function go(delta: number) {
     setIndex((i) => (i + delta + slides.length) % slides.length);
   }
 
   return (
-    <section className="bg-island px-4 py-16 sm:px-6 sm:py-20">
-      <div className="mx-auto max-w-6xl">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-lagoon">
-              Google · 4.8 ★
-            </p>
-            <h2 className="mt-3 font-display text-3xl font-semibold text-jungle sm:text-4xl">
-              What travelers say
-            </h2>
+    <section
+      className={cn(
+        "relative overflow-hidden px-4 py-16 sm:px-6 sm:py-24",
+        dark ? "bg-jungle text-foam" : "bg-island text-jungle",
+      )}
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
+      {dark && (
+        <>
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_20%_0%,rgba(240,180,41,0.18),transparent_45%),radial-gradient(ellipse_at_90%_80%,rgba(45,138,120,0.35),transparent_50%)]"
+          />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -left-16 top-10 font-display text-[11rem] leading-none text-foam/[0.06] sm:text-[16rem]"
+          >
+            “
           </div>
-          <div className="flex flex-wrap gap-3">
-            <a
-              href={SITE.googleMapsReviews}
-              target="_blank"
-              rel="noreferrer"
-              className="text-sm font-semibold text-lagoon hover:text-jungle"
-            >
-              See on Google →
-            </a>
-            {showFormLink && (
-              <Link href="/reviews" className="text-sm font-semibold text-leaf">
-                Write a review →
-              </Link>
-            )}
-          </div>
+        </>
+      )}
+      {!dark && (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -left-10 top-6 font-display text-[10rem] leading-none text-jungle/[0.05] sm:text-[14rem]"
+        >
+          “
         </div>
+      )}
 
-        <div className="mt-10 overflow-hidden rounded-[1.75rem] border border-line bg-foam px-4 py-8 sm:px-10 sm:py-10">
-          <div className="flex items-center gap-2 sm:gap-4">
-            <button
-              type="button"
-              onClick={() => go(-1)}
-              aria-label="Previous review"
-              className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-line text-jungle transition hover:bg-mist"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </button>
+      <div className="relative mx-auto max-w-4xl text-center">
+        <p
+          className={cn(
+            "text-sm font-semibold uppercase tracking-[0.22em]",
+            dark ? "text-sun" : "text-lagoon",
+          )}
+        >
+          Google · 4.8 ★ · {slides.length} reviews
+        </p>
+        <h2
+          className={cn(
+            "mt-3 font-display text-3xl font-semibold sm:text-4xl md:text-5xl",
+            dark ? "text-foam" : "text-jungle",
+          )}
+        >
+          What travelers say
+        </h2>
+        <p
+          className={cn(
+            "mx-auto mt-3 max-w-xl text-sm sm:text-base",
+            dark ? "text-foam/70" : "text-muted",
+          )}
+        >
+          Real words from guests who rode and toured with Tripzo across Sri Lanka.
+        </p>
 
-            <div className="relative min-h-[7.5rem] flex-1 overflow-hidden text-center sm:min-h-[6rem]">
-              {slides.map((r, i) => (
-                <blockquote
-                  key={r.id}
-                  className={cn(
-                    "absolute inset-0 flex flex-col items-center justify-center transition-all duration-500",
-                    i === index
-                      ? "translate-y-0 opacity-100"
-                      : i < index
-                        ? "-translate-y-3 opacity-0"
-                        : "translate-y-3 opacity-0",
-                  )}
-                  aria-hidden={i !== index}
-                >
-                  <div className="mb-3 flex gap-0.5">
-                    {Array.from({ length: 5 }).map((_, s) => (
-                      <Star
-                        key={s}
-                        className={cn(
-                          "h-4 w-4",
-                          s < r.rating ? "fill-sun text-sun" : "text-line",
-                        )}
-                      />
-                    ))}
-                  </div>
-                  <p className="line-clamp-2 max-w-3xl text-base leading-snug text-jungle sm:line-clamp-1 sm:text-lg sm:leading-relaxed">
-                    “{r.comment}”
-                  </p>
-                  <footer className="mt-3 text-sm text-muted">
-                    <span className="font-semibold text-jungle">{r.name}</span>
-                    {(r.country || r.tourTitle) && (
-                      <span>
-                        {" "}
-                        · {[r.country, r.tourTitle].filter(Boolean).join(" · ")}
-                      </span>
-                    )}
-                  </footer>
-                </blockquote>
-              ))}
-            </div>
-
-            <button
-              type="button"
-              onClick={() => go(1)}
-              aria-label="Next review"
-              className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-line text-jungle transition hover:bg-mist"
-            >
-              <ChevronRight className="h-5 w-5" />
-            </button>
-          </div>
-
-          <div className="mt-6 flex justify-center gap-2">
+        <div className="mt-10 sm:mt-14">
+          <div className="relative mx-auto min-h-[14rem] sm:min-h-[12rem]">
             {slides.map((r, i) => (
-              <button
+              <blockquote
                 key={r.id}
-                type="button"
-                onClick={() => setIndex(i)}
-                aria-label={`Show review by ${r.name}`}
                 className={cn(
-                  "h-1.5 rounded-full transition-all",
-                  i === index ? "w-7 bg-lagoon" : "w-2.5 bg-line hover:bg-muted/40",
+                  "absolute inset-0 flex flex-col items-center justify-center transition-all duration-700 ease-out",
+                  i === index
+                    ? "translate-y-0 scale-100 opacity-100"
+                    : i < index
+                      ? "-translate-y-4 scale-[0.98] opacity-0"
+                      : "translate-y-4 scale-[0.98] opacity-0",
                 )}
-              />
+                aria-hidden={i !== index}
+              >
+                <div className="mb-5 flex gap-1">
+                  {Array.from({ length: 5 }).map((_, s) => (
+                    <Star
+                      key={s}
+                      className={cn(
+                        "h-5 w-5",
+                        s < r.rating
+                          ? "fill-sun text-sun"
+                          : dark
+                            ? "text-foam/25"
+                            : "text-line",
+                      )}
+                    />
+                  ))}
+                </div>
+                <p
+                  className={cn(
+                    "max-w-3xl font-display text-xl font-medium leading-snug text-balance sm:text-2xl md:text-[1.75rem] md:leading-relaxed",
+                    dark ? "text-foam" : "text-jungle",
+                  )}
+                >
+                  “{r.comment}”
+                </p>
+              </blockquote>
             ))}
           </div>
+
+          <div className="mt-8 flex flex-col items-center gap-4 sm:mt-10">
+            <div className="flex items-center gap-3">
+              <span
+                aria-hidden
+                className="grid h-12 w-12 place-items-center rounded-full bg-sun/90 font-display text-sm font-semibold text-jungle"
+              >
+                {initials || "T"}
+              </span>
+              <div className="text-left">
+                <p className={cn("font-semibold", dark ? "text-foam" : "text-jungle")}>
+                  {current.name}
+                </p>
+                <p className={cn("text-sm", dark ? "text-foam/65" : "text-muted")}>
+                  {[current.country, current.tourTitle].filter(Boolean).join(" · ") ||
+                    "Tripzo guest"}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => go(-1)}
+                aria-label="Previous review"
+                className={cn(
+                  "grid h-11 w-11 place-items-center rounded-full border transition",
+                  dark
+                    ? "border-foam/25 text-foam hover:border-sun hover:bg-sun/10"
+                    : "border-line text-jungle hover:bg-mist",
+                )}
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <div className="flex gap-2">
+                {slides.map((r, i) => (
+                  <button
+                    key={r.id}
+                    type="button"
+                    onClick={() => setIndex(i)}
+                    aria-label={`Show review by ${r.name}`}
+                    className={cn(
+                      "h-1.5 rounded-full transition-all",
+                      i === index
+                        ? "w-8 bg-sun"
+                        : dark
+                          ? "w-2.5 bg-foam/30 hover:bg-foam/55"
+                          : "w-2.5 bg-line hover:bg-muted/40",
+                    )}
+                  />
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={() => go(1)}
+                aria-label="Next review"
+                className={cn(
+                  "grid h-11 w-11 place-items-center rounded-full border transition",
+                  dark
+                    ? "border-foam/25 text-foam hover:border-sun hover:bg-sun/10"
+                    : "border-line text-jungle hover:bg-mist",
+                )}
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
         </div>
 
-        {/* Keep current in DOM for screen readers when animating */}
-        <p className="sr-only">
-          {current.name}: {current.comment}
-        </p>
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-4 sm:mt-12">
+          <a
+            href={SITE.googleMapsReviews}
+            target="_blank"
+            rel="noreferrer"
+            className={cn(
+              "inline-flex min-h-11 items-center rounded-full border px-5 py-2.5 text-sm font-semibold transition",
+              dark
+                ? "border-foam/30 text-foam hover:border-sun hover:text-sun"
+                : "border-line text-jungle hover:border-lagoon hover:text-lagoon",
+            )}
+          >
+            See on Google
+          </a>
+          {showFormLink && (
+            <Link
+              href="/reviews"
+              className="inline-flex min-h-11 items-center rounded-full bg-sun px-5 py-2.5 text-sm font-bold text-jungle transition hover:bg-gold"
+            >
+              Write a review
+            </Link>
+          )}
+        </div>
       </div>
+
+      <p className="sr-only">
+        {current.name}: {current.comment}
+      </p>
     </section>
   );
 }
