@@ -123,7 +123,7 @@ export function ReviewsSection({
           Real words from guests who rode and toured with Tripzo across Sri Lanka.
         </p>
 
-        {/* Grid stack: height follows the tallest review — no overlap */}
+        {/* Grid stack: height follows the tallest review  -  no overlap */}
         <div className="mt-10 grid sm:mt-12">
           {slides.map((r, i) => {
             const active = i === index;

@@ -10,11 +10,11 @@ export function FaqSection() {
   const faqs = [
   {
     q: "Do you offer airport transfers?",
-    a: "Yes — private airport pickup and drop anywhere in Sri Lanka, with flight tracking and meet-and-greet on request.",
+    a: "Yes  -  private airport pickup and drop anywhere in Sri Lanka, with flight tracking and meet-and-greet on request.",
   },
   {
     q: "Can you customize the 7-day tour?",
-    a: "Absolutely. The classic circuit is a starting point — we adjust days, hotels pace, and optional stops around your interests.",
+    a: "Absolutely. The classic circuit is a starting point  -  we adjust days, hotels pace, and optional stops around your interests.",
   },
   {
     q: "What vehicles do you have?",
@@ -22,7 +22,7 @@ export function FaqSection() {
   },
   {
     q: "How do I book or get a quote?",
-    a: `Use the Book page, WhatsApp ${contact.phoneDisplay}, or email ${contact.email}. Share dates, travelers, and destinations — we reply quickly.`,
+    a: `Use the Book page, WhatsApp ${contact.phoneDisplay}, or email ${contact.email}. Share dates, travelers, and destinations  -  we reply quickly.`,
   },
   {
     q: "Where do team trip photos appear?",

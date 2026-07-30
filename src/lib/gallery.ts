@@ -14,8 +14,9 @@ export type ShowcaseImage = {
   span?: "tall" | "wide" | "normal";
 };
 
-/** Curated Sri Lanka showcase — used when admin uploads are empty / as base set */
+/** Curated Sri Lanka showcase. Multiple photos per place open in the lightbox slideshow. */
 export const showcaseGallery: ShowcaseImage[] = [
+  // Sigiriya (multiple)
   {
     id: "sg-sigiriya",
     src: "/images/gallery/gallery-sigiriya.jpg",
@@ -24,11 +25,43 @@ export const showcaseGallery: ShowcaseImage[] = [
     span: "wide",
   },
   {
+    id: "sg-sigiriya-2",
+    src: "/images/gallery/gallery-sigiriya-2.jpg",
+    title: "Sigiriya Lion Rock",
+    category: "heritage",
+  },
+  {
+    id: "sg-sigiriya-3",
+    src: "/images/gallery/gallery-sigiriya-3.jpg",
+    title: "Sigiriya from the hills",
+    category: "heritage",
+  },
+  {
+    id: "sg-sigiriya-4",
+    src: "/images/gallery/gallery-sigiriya-4.jpg",
+    title: "Sigiriya Rock Fortress",
+    category: "heritage",
+  },
+  // Temple of the Tooth (multiple)
+  {
     id: "sg-tooth",
     src: "/images/gallery/gallery-tooth.jpg",
     title: "Temple of the Tooth, Kandy",
     category: "heritage",
   },
+  {
+    id: "sg-tooth-2",
+    src: "/images/gallery/gallery-tooth-2.jpg",
+    title: "Temple of the Tooth, Kandy",
+    category: "heritage",
+  },
+  {
+    id: "sg-tooth-3",
+    src: "/images/gallery/gallery-tooth-3.jpg",
+    title: "Sri Dalada Maligawa",
+    category: "heritage",
+  },
+  // Nuwara Eliya / tea (multiple)
   {
     id: "sg-tea",
     src: "/images/gallery/gallery-tea.jpg",
@@ -37,6 +70,25 @@ export const showcaseGallery: ShowcaseImage[] = [
     span: "tall",
   },
   {
+    id: "sg-tea-2",
+    src: "/images/gallery/gallery-tea-2.jpg",
+    title: "Nuwara Eliya tea estates",
+    category: "hills",
+  },
+  {
+    id: "sg-tea-3",
+    src: "/images/gallery/gallery-tea-3.jpg",
+    title: "Tea country, Nuwara Eliya",
+    category: "hills",
+  },
+  {
+    id: "sg-tea-picker",
+    src: "/images/gallery/tea-picker.jpg",
+    title: "Tea country life",
+    category: "hills",
+  },
+  // Ella
+  {
     id: "sg-ella",
     src: "/images/gallery/gallery-ella.jpg",
     title: "Nine Arch Bridge, Ella",
@@ -44,23 +96,37 @@ export const showcaseGallery: ShowcaseImage[] = [
     span: "wide",
   },
   {
+    id: "sg-ravana",
+    src: "/images/gallery/ravana-falls.jpg",
+    title: "Ravana Falls",
+    category: "hills",
+  },
+  // Wildlife
+  {
     id: "sg-yala",
     src: "/images/gallery/gallery-yala.jpg",
     title: "Yala National Park",
     category: "wildlife",
   },
   {
+    id: "sg-udawalawe",
+    src: "/images/gallery/udawalawe.jpg",
+    title: "Udawalawe elephants",
+    category: "wildlife",
+    span: "wide",
+  },
+  {
+    id: "sg-pinnawala",
+    src: "/images/gallery/gallery-pinnawala.jpg",
+    title: "Pinnawala elephants",
+    category: "wildlife",
+  },
+  // Heritage / cities
+  {
     id: "sg-galle",
     src: "/images/gallery/gallery-galle.jpg",
     title: "Galle Dutch Fort",
     category: "heritage",
-  },
-  {
-    id: "sg-beach",
-    src: "/images/gallery/gallery-beach.jpg",
-    title: "Southern coastline",
-    category: "beach",
-    span: "wide",
   },
   {
     id: "sg-dambulla",
@@ -69,30 +135,10 @@ export const showcaseGallery: ShowcaseImage[] = [
     category: "heritage",
   },
   {
-    id: "sg-pinnawala",
-    src: "/images/gallery/gallery-pinnawala.jpg",
-    title: "Pinnawala elephants",
-    category: "wildlife",
-  },
-  {
     id: "sg-kandy",
     src: "/images/gallery/gallery-kandy.jpg",
     title: "Kandy Lake",
     category: "heritage",
-  },
-  {
-    id: "sg-train",
-    src: "/images/gallery/train-hills.jpg",
-    title: "Scenic hill-country train",
-    category: "journey",
-    span: "wide",
-  },
-  {
-    id: "sg-mist",
-    src: "/images/gallery/mist-hills.jpg",
-    title: "Golden hour over the rock fortress",
-    category: "heritage",
-    span: "tall",
   },
   {
     id: "sg-polonnaruwa",
@@ -107,28 +153,37 @@ export const showcaseGallery: ShowcaseImage[] = [
     category: "heritage",
   },
   {
+    id: "sg-jaffna",
+    src: "/images/gallery/jaffna.jpg",
+    title: "Nallur Temple, Jaffna",
+    category: "heritage",
+  },
+  // Hills
+  {
     id: "sg-horton",
     src: "/images/gallery/horton.jpg",
     title: "Horton Plains",
     category: "hills",
   },
   {
-    id: "sg-stilt",
-    src: "/images/gallery/stilt-fishermen.jpg",
-    title: "Stilt fishermen",
-    category: "beach",
-  },
-  {
-    id: "sg-ravana",
-    src: "/images/gallery/ravana-falls.jpg",
-    title: "Ravana Falls",
+    id: "sg-adam",
+    src: "/images/gallery/adam-peak.jpg",
+    title: "Adam's Peak",
     category: "hills",
   },
   {
-    id: "sg-udawalawe",
-    src: "/images/gallery/udawalawe.jpg",
-    title: "Udawalawe elephants",
-    category: "wildlife",
+    id: "sg-mist",
+    src: "/images/gallery/mist-hills.jpg",
+    title: "Highland mist over tea country",
+    category: "hills",
+    span: "tall",
+  },
+  // Beach
+  {
+    id: "sg-beach",
+    src: "/images/gallery/gallery-beach.jpg",
+    title: "Southern coastline",
+    category: "beach",
     span: "wide",
   },
   {
@@ -138,10 +193,10 @@ export const showcaseGallery: ShowcaseImage[] = [
     category: "beach",
   },
   {
-    id: "sg-adam",
-    src: "/images/gallery/adam-peak.jpg",
-    title: "Adam’s Peak",
-    category: "hills",
+    id: "sg-stilt",
+    src: "/images/gallery/stilt-fishermen.jpg",
+    title: "Stilt fishermen",
+    category: "beach",
   },
   {
     id: "sg-whale",
@@ -150,17 +205,13 @@ export const showcaseGallery: ShowcaseImage[] = [
     category: "beach",
     span: "wide",
   },
+  // Journey
   {
-    id: "sg-tea-picker",
-    src: "/images/gallery/tea-picker.jpg",
-    title: "Tea country life",
-    category: "hills",
-  },
-  {
-    id: "sg-jaffna",
-    src: "/images/gallery/jaffna.jpg",
-    title: "Nallur Temple, Jaffna",
-    category: "heritage",
+    id: "sg-train",
+    src: "/images/gallery/train-hills.jpg",
+    title: "Scenic hill-country train",
+    category: "journey",
+    span: "wide",
   },
   {
     id: "sg-train-window",

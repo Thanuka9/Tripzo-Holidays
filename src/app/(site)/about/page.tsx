@@ -4,7 +4,7 @@ import { SITE } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "About",
-  description: "About Tripzo Cabs & Tours — reliable Sri Lanka transport and tour experiences.",
+  description: "About Tripzo Cabs & Tours  -  reliable Sri Lanka transport and tour experiences.",
 };
 
 export default function AboutPage() {
@@ -36,7 +36,7 @@ export default function AboutPage() {
           comfortable vehicles with routes designed for real travelers.
         </p>
         <p className="mt-4 leading-relaxed text-muted">
-          We serve locals and visitors across Sri Lanka — from Colombo and the Cultural
+          We serve locals and visitors across Sri Lanka  -  from Colombo and the Cultural
           Triangle to Kandy, Nuwara Eliya, Ella, Yala, and the southern coast. Your journey
           stays flexible, clear, and personal.
         </p>

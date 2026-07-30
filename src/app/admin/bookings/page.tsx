@@ -152,7 +152,7 @@ export default function AdminBookingsPage() {
             onClick={() => setSelectedDate(null)}
             className="rounded-full border border-sun/40 bg-sun/10 px-3 py-1.5 text-xs text-sun"
           >
-            Clear date {selectedDate} Ã—
+            Clear date {selectedDate} Ã - 
           </button>
         )}
       </div>

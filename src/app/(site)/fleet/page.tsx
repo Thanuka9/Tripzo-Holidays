@@ -6,7 +6,7 @@ import { getFleet } from "@/lib/db";
 export const metadata: Metadata = {
   title: "Our Fleet",
   description:
-    "Tripzo Holidays fleet — sedan hybrid, KDH vans, mini coach and luxury coach with real vehicle photos.",
+    "Tripzo Holidays fleet  -  sedan hybrid, KDH vans, mini coach and luxury coach with real vehicle photos.",
 };
 
 export const dynamic = "force-dynamic";
@@ -24,7 +24,7 @@ export default async function FleetPage() {
           Our fleet
         </h1>
         <p className="mt-4 max-w-2xl text-sm text-muted sm:text-base">
-          Real Tripzo vehicles — from hybrid sedans to KDH vans and coaches — matched to your
+          Real Tripzo vehicles  -  from hybrid sedans to KDH vans and coaches  -  matched to your
           group size across Sri Lanka.
         </p>
 

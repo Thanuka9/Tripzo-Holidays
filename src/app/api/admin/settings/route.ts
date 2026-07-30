@@ -28,7 +28,7 @@ export async function PUT(req: Request) {
     const message =
       err instanceof Error
         ? err.message
-        : "Could not save settings — storage may be read-only on this host.";
+        : "Could not save settings  -  storage may be read-only on this host.";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

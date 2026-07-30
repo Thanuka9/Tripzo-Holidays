@@ -67,9 +67,9 @@ export default function AdminGalleryPage() {
     form.reset();
     setMessage(
       kind === "hero"
-        ? "Hero slide added — appears on the home page slideshow."
+        ? "Hero slide added  -  appears on the home page slideshow."
         : kind === "team"
-          ? "Trip photo uploaded — shows on Home and Gallery → Our trips."
+          ? "Trip photo uploaded  -  shows on Home and Gallery → Our trips."
           : "Photo uploaded to the gallery.",
     );
     await load();
@@ -324,7 +324,7 @@ export default function AdminGalleryPage() {
             </h2>
             <p className="mt-1 text-xs text-zinc-500">
               {kind === "general"
-                ? "Curated island photos plus your uploads — reorder, set main, replace, remove"
+                ? "Curated island photos plus your uploads  -  reorder, set main, replace, remove"
                 : "Reorder with ← → · Set main cover · Replace or remove"}
             </p>
           </div>

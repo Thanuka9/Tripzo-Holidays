@@ -34,7 +34,7 @@ export const tours: Tour[] = [
     pdfUrl: "/Packages/Tripzo_Holidays_Premium_7_Day_Sri_Lanka_Itinerary_260615_205347.pdf",
     image: "/images/destinations/hero-sigiriya.jpg",
     summary:
-      "A carefully crafted premium week across Sri Lanka — from Pinnawala and Sigiriya to Kandy, the alpine train, Ella, Yala safari, and Galle Fort — ending with a smooth Southern Expressway airport transfer. Chauffeur guide: Chathura Bandara.",
+      "A carefully crafted premium week across Sri Lanka  -  from Pinnawala and Sigiriya to Kandy, the alpine train, Ella, Yala safari, and Galle Fort  -  ending with a smooth Southern Expressway airport transfer. Chauffeur guide: Chathura Bandara.",
     highlights: [
       "Pinnawala elephant viewing",
       "Sigiriya Rock Fortress",
@@ -74,7 +74,7 @@ export const tours: Tour[] = [
         day: 4,
         title: "Nanu Oya → Ella (Scenic Train)",
         description:
-          "The absolute highlight of the alpine railway — guests take the scenic train from Nanu Oya to Ella, while you seamlessly transport their heavy luggage in the luxury vehicle.",
+          "The absolute highlight of the alpine railway  -  guests take the scenic train from Nanu Oya to Ella, while you seamlessly transport their heavy luggage in the luxury vehicle.",
         highlights: ["Scenic train", "Luggage by luxury vehicle", "Ella"],
       },
       {
@@ -117,7 +117,7 @@ export const tours: Tour[] = [
     pdfUrl: "/Packages/Tripzo_Holidays_Premium_10_Day_Sri_Lanka_Itinerary_260615_205452.pdf",
     image: "/images/destinations/hero-ella.jpg",
     summary:
-      "The definitive Sri Lankan journey — ancient fortresses, misty tea hills, alpine trains, leopard country, Mirissa beaches, and colonial Galle. Seamless luxury transport with Chathura Bandara.",
+      "The definitive Sri Lankan journey  -  ancient fortresses, misty tea hills, alpine trains, leopard country, Mirissa beaches, and colonial Galle. Seamless luxury transport with Chathura Bandara.",
     highlights: [
       "Sigiriya & Dambulla",
       "Kandy cultural show",
@@ -138,7 +138,7 @@ export const tours: Tour[] = [
         day: 2,
         title: "Sigiriya & Dambulla (or Minneriya)",
         description:
-          "Early UNESCO Sigiriya climb. Afternoon Dambulla Cave Temple — or optional Minneriya elephant safari.",
+          "Early UNESCO Sigiriya climb. Afternoon Dambulla Cave Temple  -  or optional Minneriya elephant safari.",
         highlights: ["Sigiriya", "Dambulla / Minneriya"],
       },
       {
@@ -194,7 +194,7 @@ export const tours: Tour[] = [
         day: 10,
         title: "Expressway → Airport",
         description:
-          "Ocean breakfast, then Southern Expressway corridor straight to BIA — stress-free departure.",
+          "Ocean breakfast, then Southern Expressway corridor straight to BIA  -  stress-free departure.",
         highlights: ["Expressway", "Airport"],
       },
     ],
@@ -211,7 +211,7 @@ export const tours: Tour[] = [
     pdfUrl: "/Packages/Tripzo_Holidays_Premium_15_Day_Sri_Lanka_Itinerary_260615_205054.pdf",
     image: "/images/destinations/mirissa-beach.jpg",
     summary:
-      "Our deepest island immersion — Cultural Triangle, Horton Plains World’s End, Ella, Yala, Mirissa, optional whales, Galle, Hikkaduwa, and Bentota Madu Ganga. Absolute comfort and flawless pacing.",
+      "Our deepest island immersion  -  Cultural Triangle, Horton Plains World’s End, Ella, Yala, Mirissa, optional whales, Galle, Hikkaduwa, and Bentota Madu Ganga. Absolute comfort and flawless pacing.",
     highlights: [
       "Minneriya elephant gathering",
       "Horton Plains World’s End",
@@ -295,7 +295,7 @@ export const tours: Tour[] = [
         day: 11,
         title: "Mirissa beach day",
         description:
-          "Coconut Tree Hill photos and leisure on Mirissa sands — seafood, surf, or rest.",
+          "Coconut Tree Hill photos and leisure on Mirissa sands  -  seafood, surf, or rest.",
         highlights: ["Coconut Tree Hill", "Beach leisure"],
       },
       {
@@ -323,7 +323,7 @@ export const tours: Tour[] = [
         day: 15,
         title: "Bentota → Airport",
         description:
-          "Final breakfast, Southern Expressway to BIA — relaxed, perfectly timed departure.",
+          "Final breakfast, Southern Expressway to BIA  -  relaxed, perfectly timed departure.",
         highlights: ["Expressway", "Airport"],
       },
     ],
@@ -337,7 +337,7 @@ export const tours: Tour[] = [
     category: "transfer",
     image: "/images/fleet/sedan/sedan-2.jpg",
     summary:
-      "Reliable airport transfers with professional drivers, clean vehicles, and on-time service — perfect for a calm arrival or departure anywhere in Sri Lanka.",
+      "Reliable airport transfers with professional drivers, clean vehicles, and on-time service  -  perfect for a calm arrival or departure anywhere in Sri Lanka.",
     highlights: ["Meet & greet", "Flight tracking", "Private vehicle", "24/7 availability"],
   },
   {
@@ -361,7 +361,7 @@ export const tours: Tour[] = [
     category: "day",
     image: "/images/destinations/sigiriya.jpg",
     summary:
-      "Climb Sigiriya Rock, explore Dambulla Cave Temple, and optionally add a Minneriya wildlife safari — all in one unforgettable day.",
+      "Climb Sigiriya Rock, explore Dambulla Cave Temple, and optionally add a Minneriya wildlife safari  -  all in one unforgettable day.",
     highlights: ["Sigiriya Rock", "Dambulla Caves", "Optional safari", "Private guide driver"],
   },
 ];

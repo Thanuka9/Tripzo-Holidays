@@ -10,7 +10,7 @@ const steps = [
   {
     icon: Map,
     title: "We craft the route",
-    text: "Airport runs, day tours, or full island circuits — matched to your pace.",
+    text: "Airport runs, day tours, or full island circuits  -  matched to your pace.",
   },
   {
     icon: Car,
@@ -20,7 +20,7 @@ const steps = [
   {
     icon: CalendarCheck,
     title: "Enjoy Sri Lanka",
-    text: "Temples, tea hills, trains, safari, and beaches — we handle the road.",
+    text: "Temples, tea hills, trains, safari, and beaches  -  we handle the road.",
   },
 ];
 

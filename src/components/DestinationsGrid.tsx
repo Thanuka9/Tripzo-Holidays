@@ -52,6 +52,7 @@ function PlaceCard({
               ? "scale-100 opacity-100"
               : "scale-105 opacity-0"
           } group-hover:scale-105`}
+          style={{ objectPosition: "center 42%" }}
           sizes="(max-width: 1024px) 100vw, 40vw"
           priority={featured && i === 0}
         />
@@ -90,7 +91,7 @@ function PlaceCard({
 export function DestinationsGrid({
   destinations,
   title = "Places we take you",
-  subtitle = "Signature stops across Sri Lanka — heritage, highlands, wildlife, and coast.",
+  subtitle = "Signature stops across Sri Lanka  -  heritage, highlands, wildlife, and coast.",
   showAllLink = true,
 }: Props) {
   return (

@@ -5,7 +5,7 @@ import { getDestinations } from "@/lib/db";
 export const metadata: Metadata = {
   title: "Destinations",
   description:
-    "Places Tripzo Cabs & Tours visits across Sri Lanka — Sigiriya, Temple of the Tooth, Nuwara Eliya, Ella, Yala, beaches, and more.",
+    "Places Tripzo Cabs & Tours visits across Sri Lanka  -  Sigiriya, Temple of the Tooth, Nuwara Eliya, Ella, Yala, beaches, and more.",
 };
 
 export const dynamic = "force-dynamic";
@@ -23,14 +23,14 @@ export default async function DestinationsPage() {
           Destinations we visit
         </h1>
         <p className="mt-4 max-w-2xl text-muted">
-          From the Cultural Triangle to tea country, wildlife parks, and the southern coast —
+          From the Cultural Triangle to tea country, wildlife parks, and the southern coast  - 
           every Tripzo journey is built around Sri Lanka’s most memorable places.
         </p>
       </div>
       <DestinationsGrid
         destinations={destinations}
         title="Explore our route stops"
-        subtitle="Real places on the Tripzo map — heritage, hills, safari, and sea."
+        subtitle="Real places on the Tripzo map  -  heritage, hills, safari, and sea."
         showAllLink={false}
       />
     </div>

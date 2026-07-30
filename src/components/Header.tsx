@@ -19,7 +19,7 @@ const links = [
   { href: "/contact", label: "Contact" },
 ];
 
-/** Pages with a dark full-bleed top — header overlays until scroll. */
+/** Pages with a dark full-bleed top  -  header overlays until scroll. */
 function isHeroOverlayPath(pathname: string | null): boolean {
   if (!pathname) return false;
   if (pathname === "/") return true;
@@ -64,7 +64,7 @@ export function Header() {
         )}
       >
         <div className="mx-auto flex h-[var(--site-header-height)] max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
-          {/* Compact mark in the bar — hero uses a text wordmark instead of a second logo plate */}
+          {/* Compact mark in the bar  -  hero uses a text wordmark instead of a second logo plate */}
           <BrandLogo onDark={!solid} size="sm" />
 
           <nav className="hidden items-center gap-0.5 lg:flex">

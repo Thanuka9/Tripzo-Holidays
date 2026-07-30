@@ -146,7 +146,7 @@ export default function AdminDashboardClient({
                 <p className="text-sm text-zinc-500">
                   {selectedDate
                     ? "No bookings on this day."
-                    : "No upcoming bookings yet — new requests will appear here."}
+                    : "No upcoming bookings yet  -  new requests will appear here."}
                 </p>
               )}
               {(selectedDate ? dayBookings : upcoming).map((b) => (

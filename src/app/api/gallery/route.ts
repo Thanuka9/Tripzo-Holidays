@@ -64,7 +64,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ image });
   } catch (err) {
     const message =
-      err instanceof Error ? err.message : "Upload failed — storage may be read-only.";
+      err instanceof Error ? err.message : "Upload failed  -  storage may be read-only.";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

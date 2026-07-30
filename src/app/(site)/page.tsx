@@ -36,7 +36,7 @@ const reasons = [
   {
     icon: Car,
     title: "Comfortable fleet",
-    text: "Prius, KDH vans, and 26-seater coaches — matched to your group size.",
+    text: "Prius, KDH vans, and 26-seater coaches  -  matched to your group size.",
   },
   {
     icon: ShieldCheck,
@@ -46,7 +46,7 @@ const reasons = [
   {
     icon: Clock3,
     title: "Always reachable",
-    text: "WhatsApp, call, or Messenger — we plan journeys around your timing.",
+    text: "WhatsApp, call, or Messenger  -  we plan journeys around your timing.",
   },
 ];
 
@@ -156,7 +156,7 @@ export default async function HomePage() {
             </h2>
             <p className="mt-4 text-foam/80 leading-relaxed">
               Airport to Sigiriya, Kandy, tea country, the scenic Ella train, Yala safari,
-              and Galle Fort — then a smooth Southern Expressway transfer home.
+              and Galle Fort  -  then a smooth Southern Expressway transfer home.
             </p>
             <ul className="mt-6 space-y-2 text-sm text-foam/85">
               {[
@@ -254,7 +254,7 @@ export default async function HomePage() {
             Ready for your next Sri Lanka adventure?
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-foam/85">
-            Tell us your dates, group size, and dream destinations — we will craft the route
+            Tell us your dates, group size, and dream destinations  -  we will craft the route
             and send a clear quote.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">

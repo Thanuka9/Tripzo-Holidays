@@ -23,7 +23,7 @@ export default async function ContactPage() {
           Contact Tripzo
         </h1>
         <p className="mt-4 max-w-xl text-muted">
-          Planning a transfer or a multi-day tour? Reach out anytime — we reply quickly on
+          Planning a transfer or a multi-day tour? Reach out anytime  -  we reply quickly on
           WhatsApp and phone.
         </p>
 

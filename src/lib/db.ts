@@ -2,7 +2,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import { randomUUID } from "crypto";
 import { defaultFleet, type Vehicle } from "./fleet";
-import { defaultDestinations, type Destination } from "./destinations";
+import { defaultDestinations, type Destination, DESTINATION_IMAGE_VERSION } from "./destinations";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 
@@ -77,7 +77,7 @@ async function ensureDataDir() {
   try {
     await fs.mkdir(DATA_DIR, { recursive: true });
   } catch {
-    // Read-only filesystem (Vercel serverless) — ignore
+    // Read-only filesystem (Vercel serverless)  -  ignore
   }
 }
 
@@ -327,7 +327,36 @@ export async function deleteGalleryImage(id: string) {
 export async function ensureDefaultHeroSlides() {
   const { slideshowSlides } = await import("./destinations");
   const gallery = await getGallery();
-  if (gallery.some((g) => g.kind === "hero")) return gallery;
+  const heroes = gallery.filter((g) => g.kind === "hero");
+
+  // Keep seeded heroes in sync with current landmark slides
+  if (heroes.length > 0) {
+    let changed = false;
+    const byId = new Map(gallery.map((g) => [g.id, g]));
+    slideshowSlides.forEach((s, i) => {
+      const id = `hero-seed-${i + 1}`;
+      const existing = byId.get(id);
+      if (existing && (existing.src !== s.src || existing.title !== s.title)) {
+        byId.set(id, {
+          ...existing,
+          src: s.src,
+          title: s.title,
+          caption: s.caption,
+        });
+        changed = true;
+      }
+    });
+    if (changed) {
+      const next = Array.from(byId.values());
+      try {
+        await writeJson("gallery.json", next);
+      } catch {
+        return sortGallery(next);
+      }
+      return sortGallery(next);
+    }
+    return gallery;
+  }
 
   const seeded: GalleryImage[] = slideshowSlides.map((s, i) => ({
     id: `hero-seed-${i + 1}`,
@@ -350,28 +379,42 @@ export async function ensureDefaultHeroSlides() {
 /** Seed curated Sri Lanka showcase photos so they appear in admin Images */
 export async function ensureShowcaseGallery() {
   const { showcaseGallery } = await import("./gallery");
-  const gallery = await getGallery();
-  const existingIds = new Set(gallery.map((g) => g.id));
-  const existingSrcs = new Set(gallery.map((g) => g.src));
+  let gallery = await getGallery();
+  const byId = new Map(gallery.map((g) => [g.id, g]));
+  let changed = false;
 
-  const missing = showcaseGallery.filter(
-    (s) => !existingIds.has(s.id) && !existingSrcs.has(s.src),
-  );
-  if (missing.length === 0) return gallery;
+  for (const [i, s] of showcaseGallery.entries()) {
+    const existing = byId.get(s.id);
+    if (!existing) {
+      byId.set(s.id, {
+        id: s.id,
+        src: s.src,
+        title: s.title,
+        kind: "general",
+        category: s.category,
+        place: s.category,
+        caption: s.category,
+        sortOrder: i,
+        featured: i === 0,
+        createdAt: new Date().toISOString(),
+      });
+      changed = true;
+      continue;
+    }
+    if (existing.src !== s.src || existing.title !== s.title) {
+      byId.set(s.id, {
+        ...existing,
+        src: s.src,
+        title: s.title,
+        category: s.category,
+        place: s.category,
+      });
+      changed = true;
+    }
+  }
 
-  const seeded: GalleryImage[] = missing.map((s, i) => ({
-    id: s.id,
-    src: s.src,
-    title: s.title,
-    kind: "general" as const,
-    category: s.category,
-    place: s.category,
-    caption: s.category,
-    sortOrder: i,
-    featured: i === 0,
-    createdAt: new Date().toISOString(),
-  }));
-  const next = [...gallery, ...seeded];
+  if (!changed) return gallery;
+  const next = Array.from(byId.values());
   try {
     await writeJson("gallery.json", next);
   } catch {
@@ -536,24 +579,89 @@ export async function reorderFleet(orderedIds: string[]) {
   return ordered;
 }
 
-export async function getDestinations() {
-  const seeded = defaultDestinations.map((d) => ({
+const LEGACY_BAD_DEST_IMAGES = new Set([
+  "/images/destinations/temple-2.jpg",
+  "/images/destinations/kandy-2.jpg",
+  "/images/destinations/wildlife-2.jpg",
+  "/images/destinations/fort-2.jpg",
+  "/images/destinations/beach-2.jpg",
+  "/images/destinations/train-2.jpg",
+  "/images/destinations/sigiriya-2.jpg",
+  "/images/destinations/sigiriya-3.jpg",
+  "/images/destinations/sigiriya-view-2.jpg",
+  "/images/destinations/sigiriya-view-3.jpg",
+  "/images/destinations/temple-of-the-tooth.jpg",
+  "/images/destinations/temple-of-the-tooth-2.jpg",
+  "/images/destinations/temple-of-the-tooth-3.jpg",
+  "/images/gallery/mist-hills.jpg", // was mixed into Nuwara Eliya slideshow
+  "/images/gallery/horton.jpg", // not Nuwara Eliya town/estates
+]);
+
+function hasLegacyBadImages(paths: string[] | undefined) {
+  return (paths || []).some((src) => LEGACY_BAD_DEST_IMAGES.has(src));
+}
+
+export async function getDestinations(): Promise<DestinationRecord[]> {
+  const seeded: DestinationRecord[] = defaultDestinations.map((d) => ({
     ...d,
     gallery: d.gallery?.length ? d.gallery : [d.image],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   }));
-  const stored = await readJson<DestinationRecord[]>(
+  let stored = await readJson<DestinationRecord[]>(
     "destinations.json",
     seeded,
   );
   const defaults = new Map(defaultDestinations.map((d) => [d.id, d]));
 
+  const meta = await readJson<{ version: number }>("destinations-meta.json", {
+    version: 0,
+  });
+  if (meta.version < DESTINATION_IMAGE_VERSION) {
+    stored = stored.map((d) => {
+      const def = defaults.get(d.id);
+      if (!def?.gallery?.length) return d;
+      return {
+        ...d,
+        image: def.image,
+        gallery: def.gallery,
+        updatedAt: new Date().toISOString(),
+      };
+    });
+    try {
+      await writeJson("destinations.json", stored);
+      await writeJson("destinations-meta.json", {
+        version: DESTINATION_IMAGE_VERSION,
+      });
+    } catch {
+      /* read-only host */
+    }
+  }
+
   return stored.map((d) => {
     const def = defaults.get(d.id);
-    if (d.gallery && d.gallery.length > 0) {
-      return { ...d, image: d.image || d.gallery[0] };
+    const gallery = (d.gallery || []).filter(
+      (src) => !LEGACY_BAD_DEST_IMAGES.has(src),
+    );
+
+    if (def?.gallery?.length && (hasLegacyBadImages(d.gallery) || gallery.length < 2)) {
+      return {
+        ...d,
+        image: def.image,
+        gallery: def.gallery,
+      };
     }
+
+    if (gallery.length > 0) {
+      return {
+        ...d,
+        gallery,
+        image: LEGACY_BAD_DEST_IMAGES.has(d.image)
+          ? gallery[0]
+          : d.image || gallery[0],
+      };
+    }
+
     if (def?.gallery?.length) {
       return {
         ...d,
@@ -561,15 +669,16 @@ export async function getDestinations() {
         gallery: def.gallery,
       };
     }
+
     return {
       ...d,
-      gallery: d.image ? [d.image] : [],
+      gallery: d.image && !LEGACY_BAD_DEST_IMAGES.has(d.image) ? [d.image] : [],
     };
   });
 }
 
 export async function upsertDestination(destination: Destination) {
-  const list = await getDestinations();
+  const list: DestinationRecord[] = await getDestinations();
   const idx = list.findIndex((d) => d.id === destination.id);
   const existing = idx >= 0 ? list[idx] : null;
   const gallery =

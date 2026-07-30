@@ -17,7 +17,7 @@ export function TeamTripsSection({ photos }: { photos: GalleryImage[] }) {
               Real trip moments
             </h2>
             <p className="mt-3 text-muted">
-              Photos our drivers and guides take with guests and at the places you visit —
+              Photos our drivers and guides take with guests and at the places you visit  - 
               uploaded from the Tripzo team.
             </p>
           </div>

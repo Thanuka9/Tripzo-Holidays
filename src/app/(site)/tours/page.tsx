@@ -6,7 +6,7 @@ import { tours } from "@/lib/tours";
 export const metadata: Metadata = {
   title: "Tour Packages",
   description:
-    "Explore Tripzo Cabs & Tours packages — airport transfers, day trips, and multi-day Sri Lanka itineraries.",
+    "Explore Tripzo Cabs & Tours packages  -  airport transfers, day trips, and multi-day Sri Lanka itineraries.",
 };
 
 export default function ToursPage() {
@@ -20,7 +20,7 @@ export default function ToursPage() {
           Tours & transfers
         </h1>
         <p className="mt-4 max-w-2xl text-sm text-muted sm:text-base">
-          Choose a ready-made island route or tell us your dates — we tailor every journey
+          Choose a ready-made island route or tell us your dates  -  we tailor every journey
           with comfortable vehicles and local know-how.
         </p>
 

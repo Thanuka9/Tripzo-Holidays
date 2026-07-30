@@ -53,7 +53,7 @@ export default function AdminDestinationsPage() {
       return;
     }
     form.reset();
-    setMessage("Destination saved — it will appear on the website.");
+    setMessage("Destination saved  -  it will appear on the website.");
     await load();
   }
 
@@ -159,7 +159,7 @@ export default function AdminDestinationsPage() {
       <h1 className="font-display text-3xl text-sun">Destinations</h1>
       <p className="mt-2 max-w-2xl text-sm text-zinc-400">
         Each place can have 4–5 photos in a slideshow. Set the main cover,
-        reorder, add, or remove images — same as fleet.
+        reorder, add, or remove images  -  same as fleet.
       </p>
 
       <form

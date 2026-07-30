@@ -72,7 +72,7 @@ export default async function TourDetailPage({ params }: Props) {
             <div className="mt-12">
               <h2 className="font-display text-3xl text-jungle">Premium 7-Day Route Map</h2>
               <p className="mt-2 text-sm text-muted">
-                Airport → Sigiriya → Kandy → Nuwara Eliya → Ella → Yala & the south coast —
+                Airport → Sigiriya → Kandy → Nuwara Eliya → Ella → Yala & the south coast  - 
                 and back.
               </p>
               <div className="mt-6 overflow-hidden rounded-[1.5rem] border border-line bg-mist/40 p-3 sm:p-5">
@@ -98,8 +98,8 @@ export default async function TourDetailPage({ params }: Props) {
               </h2>
               <p className="mt-2 text-sm text-muted">
                 {tour.slug === "seven-days-sri-lanka"
-                  ? "Your complete Seven Days Sri Lanka Tour Package — paced for comfort, scenery, and signature stops."
-                  : "How this journey is crafted — paced for comfort, scenery, and signature stops."}
+                  ? "Your complete Seven Days Sri Lanka Tour Package  -  paced for comfort, scenery, and signature stops."
+                  : "How this journey is crafted  -  paced for comfort, scenery, and signature stops."}
               </p>
               <ol className="mt-8 space-y-5">
                 {tour.itinerary.map((day) => (

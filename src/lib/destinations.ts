@@ -10,6 +10,12 @@ export type Destination = {
   slideshow?: boolean;
 };
 
+/**
+ * Bump when seeded landmark photos change so stored destinations.json
+ * refreshes galleries for built-in place IDs.
+ */
+export const DESTINATION_IMAGE_VERSION = 3;
+
 export const defaultDestinations: Destination[] = [
   {
     id: "sigiriya",
@@ -17,13 +23,13 @@ export const defaultDestinations: Destination[] = [
     region: "Cultural Triangle",
     description:
       "Climb the iconic Lion Rock fortress and take in panoramic views across the ancient kingdom.",
-    image: "/images/destinations/hero-sigiriya.jpg",
+    image: "/images/destinations/sigiriya-real-1.jpg",
     gallery: [
+      "/images/destinations/sigiriya-real-1.jpg",
       "/images/destinations/hero-sigiriya.jpg",
-      "/images/destinations/sigiriya-2.jpg",
-      "/images/destinations/sigiriya-3.jpg",
-      "/images/destinations/sigiriya.jpg",
-      "/images/gallery/gallery-sigiriya.jpg",
+      "/images/destinations/sigiriya-real-2.jpg",
+      "/images/destinations/sigiriya-real-3.jpg",
+      "/images/gallery/gallery-sigiriya-3.jpg",
     ],
     featured: true,
     slideshow: true,
@@ -34,13 +40,13 @@ export const defaultDestinations: Destination[] = [
     region: "Kandy",
     description:
       "Visit Sri Dalada Maligawa, the sacred Temple of the Tooth Relic in the hill capital.",
-    image: "/images/destinations/temple-2.jpg",
+    image: "/images/destinations/tooth-real-1.jpg",
     gallery: [
-      "/images/destinations/temple-2.jpg",
-      "/images/destinations/temple-of-the-tooth.jpg",
-      "/images/gallery/gallery-tooth.jpg",
-      "/images/destinations/kandy-2.jpg",
-      "/images/gallery/gallery-kandy.jpg",
+      "/images/destinations/tooth-real-1.jpg",
+      "/images/destinations/tooth-real-2.jpg",
+      "/images/destinations/tooth-real-3.jpg",
+      "/images/gallery/gallery-tooth-2.jpg",
+      "/images/gallery/gallery-tooth-3.jpg",
     ],
     featured: true,
     slideshow: true,
@@ -51,13 +57,13 @@ export const defaultDestinations: Destination[] = [
     region: "Tea Country",
     description:
       "Walk misty tea estates, visit a premium factory, and enjoy cool highland air.",
-    image: "/images/gallery/gallery-tea.jpg",
+    image: "/images/destinations/nuwara-eliya-real-3.jpg",
     gallery: [
+      "/images/destinations/nuwara-eliya-real-3.jpg",
+      "/images/destinations/nuwara-eliya-real-1.jpg",
       "/images/gallery/gallery-tea.jpg",
-      "/images/destinations/nuwara-eliya.jpg",
-      "/images/gallery/tea-picker.jpg",
-      "/images/gallery/horton.jpg",
-      "/images/gallery/mist-hills.jpg",
+      "/images/gallery/gallery-tea-2.jpg",
+      "/images/gallery/gallery-tea-3.jpg",
     ],
     featured: true,
     slideshow: true,
@@ -68,13 +74,13 @@ export const defaultDestinations: Destination[] = [
     region: "Hill Country",
     description:
       "Ride the scenic train, photograph the Nine Arch Bridge, and trek Little Adam’s Peak.",
-    image: "/images/destinations/hero-ella.jpg",
+    image: "/images/destinations/ella-nine-arch-2.jpg",
     gallery: [
-      "/images/destinations/hero-ella.jpg",
+      "/images/destinations/ella-nine-arch-2.jpg",
+      "/images/destinations/ella-nine-arch-train.jpg",
       "/images/destinations/ella-nine-arch.jpg",
       "/images/gallery/gallery-ella.jpg",
-      "/images/destinations/train-2.jpg",
-      "/images/gallery/train-hills.jpg",
+      "/images/destinations/hero-ella.jpg",
     ],
     featured: true,
     slideshow: true,
@@ -85,13 +91,13 @@ export const defaultDestinations: Destination[] = [
     region: "South Coast",
     description:
       "Golden-hour coastlines, coconut palms, and relaxed beach stops after safari days.",
-    image: "/images/destinations/beach-2.jpg",
+    image: "/images/destinations/mirissa-2.jpg",
     gallery: [
-      "/images/destinations/beach-2.jpg",
+      "/images/destinations/mirissa-2.jpg",
       "/images/destinations/mirissa-beach.jpg",
-      "/images/gallery/gallery-beach.jpg",
+      "/images/destinations/unawatuna-2.jpg",
       "/images/gallery/unawatuna.jpg",
-      "/images/gallery/whale.jpg",
+      "/images/gallery/gallery-beach.jpg",
     ],
     featured: true,
     slideshow: true,
@@ -102,13 +108,12 @@ export const defaultDestinations: Destination[] = [
     region: "South Coast",
     description:
       "Sunset walks along UNESCO fort walls where ocean breeze meets colonial streets.",
-    image: "/images/destinations/fort-2.jpg",
+    image: "/images/destinations/galle-fort-2.jpg",
     gallery: [
-      "/images/destinations/fort-2.jpg",
+      "/images/destinations/galle-fort-2.jpg",
       "/images/destinations/galle-fort.jpg",
       "/images/gallery/gallery-galle.jpg",
-      "/images/gallery/stilt-fishermen.jpg",
-      "/images/gallery/unawatuna.jpg",
+      "/images/destinations/galle-fort-3.jpg",
     ],
     featured: true,
     slideshow: true,
@@ -119,13 +124,13 @@ export const defaultDestinations: Destination[] = [
     region: "Wildlife",
     description:
       "Dawn jeep safari in search of leopards, elephants, and wild open plains.",
-    image: "/images/destinations/wildlife-2.jpg",
+    image: "/images/destinations/yala-leopard.jpg",
     gallery: [
-      "/images/destinations/wildlife-2.jpg",
+      "/images/destinations/yala-leopard.jpg",
+      "/images/destinations/yala-elephant-2.jpg",
       "/images/destinations/yala.jpg",
       "/images/gallery/gallery-yala.jpg",
       "/images/gallery/udawalawe.jpg",
-      "/images/gallery/gallery-pinnawala.jpg",
     ],
     featured: true,
     slideshow: true,
@@ -136,13 +141,11 @@ export const defaultDestinations: Destination[] = [
     region: "Cultural Triangle",
     description:
       "Explore ancient cave shrines filled with Buddha statues and painted ceilings.",
-    image: "/images/destinations/dambulla.jpg",
+    image: "/images/destinations/dambulla-2.jpg",
     gallery: [
+      "/images/destinations/dambulla-2.jpg",
       "/images/destinations/dambulla.jpg",
       "/images/gallery/gallery-dambulla.jpg",
-      "/images/gallery/polonnaruwa.jpg",
-      "/images/gallery/anuradhapura.jpg",
-      "/images/destinations/sigiriya-2.jpg",
     ],
     featured: true,
   },
@@ -152,13 +155,11 @@ export const defaultDestinations: Destination[] = [
     region: "Central Province",
     description:
       "Meet gentle giants at the elephant orphanage on your arrival day route.",
-    image: "/images/destinations/pinnawala.jpg",
+    image: "/images/destinations/pinnawala-2.jpg",
     gallery: [
+      "/images/destinations/pinnawala-2.jpg",
       "/images/destinations/pinnawala.jpg",
       "/images/gallery/gallery-pinnawala.jpg",
-      "/images/gallery/udawalawe.jpg",
-      "/images/destinations/wildlife-2.jpg",
-      "/images/gallery/gallery-yala.jpg",
     ],
     featured: true,
   },
@@ -168,13 +169,11 @@ export const defaultDestinations: Destination[] = [
     region: "Kandy",
     description:
       "Stroll the lakeside, catch a cultural dance, and feel the royal hill-city atmosphere.",
-    image: "/images/destinations/kandy-2.jpg",
+    image: "/images/destinations/kandy-lake-2.jpg",
     gallery: [
-      "/images/destinations/kandy-2.jpg",
+      "/images/destinations/kandy-lake-2.jpg",
       "/images/destinations/kandy-lake.jpg",
       "/images/gallery/gallery-kandy.jpg",
-      "/images/destinations/temple-2.jpg",
-      "/images/gallery/gallery-tooth.jpg",
     ],
     featured: true,
   },
@@ -182,37 +181,37 @@ export const defaultDestinations: Destination[] = [
 
 export const slideshowSlides = [
   {
-    src: "/images/destinations/hero-sigiriya.jpg",
+    src: "/images/destinations/sigiriya-real-1.jpg",
     title: "Sigiriya Rock Fortress",
     caption: "Cultural Triangle · Ancient Sri Lanka",
   },
   {
-    src: "/images/destinations/temple-2.jpg",
+    src: "/images/destinations/tooth-real-1.jpg",
     title: "Temple of the Tooth",
     caption: "Kandy · Sacred heritage",
   },
   {
-    src: "/images/gallery/gallery-tea.jpg",
+    src: "/images/destinations/nuwara-eliya-real-3.jpg",
     title: "Nuwara Eliya Tea Country",
     caption: "Misty highlands · Factory tours",
   },
   {
-    src: "/images/destinations/hero-ella.jpg",
+    src: "/images/destinations/ella-nine-arch-2.jpg",
     title: "Ella Scenic Railway",
     caption: "Nine Arch Bridge · Hill country",
   },
   {
-    src: "/images/destinations/wildlife-2.jpg",
+    src: "/images/destinations/yala-leopard.jpg",
     title: "Yala Wildlife Safari",
     caption: "Leopards · Elephants · Dawn drives",
   },
   {
-    src: "/images/destinations/beach-2.jpg",
+    src: "/images/destinations/mirissa-2.jpg",
     title: "Southern Beaches",
     caption: "Palm coast · Golden sunsets",
   },
   {
-    src: "/images/destinations/fort-2.jpg",
+    src: "/images/destinations/galle-fort-2.jpg",
     title: "Galle Dutch Fort",
     caption: "UNESCO · Ocean ramparts",
   },

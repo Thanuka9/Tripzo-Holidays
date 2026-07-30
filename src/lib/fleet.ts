@@ -14,7 +14,7 @@ export const defaultFleet: Vehicle[] = [
     id: "sedan",
     name: "Sedan / Hybrid Luxury",
     description:
-      "Premium hybrid sedan travel for couples and small parties — ideal for airport runs, city transfers, and comfortable island touring with Chathura Bandara.",
+      "Premium hybrid sedan travel for couples and small parties  -  ideal for airport runs, city transfers, and comfortable island touring with Chathura Bandara.",
     capacity: "1–3 passengers",
     idealFor: "Airport transfers & couples",
     image: "/images/fleet/sedan/sedan-1.jpg",
@@ -30,7 +30,7 @@ export const defaultFleet: Vehicle[] = [
     id: "kdh",
     name: "Toyota KDH Van",
     description:
-      "Spacious KDH vans for families and small groups — roomy seating, generous luggage space, and tour-ready comfort across multi-day Sri Lanka routes.",
+      "Spacious KDH vans for families and small groups  -  roomy seating, generous luggage space, and tour-ready comfort across multi-day Sri Lanka routes.",
     capacity: "6–10 passengers",
     idealFor: "Family tours & small groups",
     image: "/images/fleet/kdh/kdh-5.jpg",
@@ -49,7 +49,7 @@ export const defaultFleet: Vehicle[] = [
     id: "mini-coach",
     name: "Mini Coach",
     description:
-      "Comfortable mini coach for medium groups — perfect for friends, office outings, and shared island adventures with room for everyone and their bags.",
+      "Comfortable mini coach for medium groups  -  perfect for friends, office outings, and shared island adventures with room for everyone and their bags.",
     capacity: "12–20 passengers",
     idealFor: "Friends & office groups",
     image: "/images/fleet/mini-coach/mini-1.jpg",
@@ -65,7 +65,7 @@ export const defaultFleet: Vehicle[] = [
     id: "luxury-coach",
     name: "Luxury Bus",
     description:
-      "High-capacity luxury coach for large families, wedding parties, and full tour groups — a safe, comfortable bubble on Sri Lanka’s roads.",
+      "High-capacity luxury coach for large families, wedding parties, and full tour groups  -  a safe, comfortable bubble on Sri Lanka’s roads.",
     capacity: "Up to 26+ passengers",
     idealFor: "Large groups & events",
     image: "/images/fleet/luxury-coach/luxury-5.jpg",

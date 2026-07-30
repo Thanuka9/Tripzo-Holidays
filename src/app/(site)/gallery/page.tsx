@@ -12,7 +12,7 @@ import { whatsappLink } from "@/lib/constants";
 export const metadata: Metadata = {
   title: "Gallery",
   description:
-    "Sri Lanka gallery — Sigiriya, Temple of the Tooth, Ella, tea country, beaches, wildlife, and real Tripzo team trip photos.",
+    "Sri Lanka gallery  -  Sigiriya, Temple of the Tooth, Ella, tea country, beaches, wildlife, and real Tripzo team trip photos.",
 };
 
 export const dynamic = "force-dynamic";
@@ -46,7 +46,7 @@ export default async function GalleryPage() {
             Sri Lanka gallery
           </h1>
           <p className="mt-3 max-w-xl text-foam/85">
-            Landmarks across the island — plus real photos from our cab team with guests on the
+            Landmarks across the island  -  plus real photos from our cab team with guests on the
             road.
             {teamCount > 0
               ? ` ${teamCount} trip photo${teamCount === 1 ? "" : "s"} from the team.`
@@ -75,12 +75,12 @@ export default async function GalleryPage() {
           <div className="mt-14 rounded-[1.75rem] bg-jungle px-6 py-10 text-center text-foam sm:px-10">
             <h2 className="font-display text-2xl sm:text-3xl">Want photos from your own trip?</h2>
             <p className="mx-auto mt-3 max-w-lg text-sm text-foam/80">
-              Book a journey with Tripzo — our team often captures memories at Sigiriya, Ella,
+              Book a journey with Tripzo  -  our team often captures memories at Sigiriya, Ella,
               Yala, and the coast to share with you.
             </p>
             <a
               href={whatsappLink(
-                "Hi Tripzo! I loved the gallery — I'd like to plan a tour.",
+                "Hi Tripzo! I loved the gallery  -  I'd like to plan a tour.",
                 contact.whatsapp,
               )}
               target="_blank"

@@ -47,7 +47,7 @@ export default async function ReviewsPage() {
           <div>
             <h2 className="font-display text-3xl text-jungle">Leave your review</h2>
             <p className="mt-3 leading-relaxed text-muted">
-              Share your Tripzo experience here — or leave a review on our{" "}
+              Share your Tripzo experience here  -  or leave a review on our{" "}
               <a
                 href={SITE.googleMapsReviews}
                 target="_blank"
