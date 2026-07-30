@@ -14,7 +14,7 @@ export type Destination = {
  * Bump when seeded landmark photos change so stored destinations.json
  * refreshes galleries for built-in place IDs.
  */
-export const DESTINATION_IMAGE_VERSION = 3;
+export const DESTINATION_IMAGE_VERSION = 6;
 
 export const defaultDestinations: Destination[] = [
   {
@@ -57,13 +57,14 @@ export const defaultDestinations: Destination[] = [
     region: "Tea Country",
     description:
       "Walk misty tea estates, visit a premium factory, and enjoy cool highland air.",
-    image: "/images/destinations/nuwara-eliya-real-3.jpg",
+    image: "/images/destinations/nuwara-eliya-real-1.jpg",
     gallery: [
-      "/images/destinations/nuwara-eliya-real-3.jpg",
       "/images/destinations/nuwara-eliya-real-1.jpg",
+      "/images/destinations/nuwara-eliya-real-2.webp",
+      "/images/destinations/nuwara-eliya-real-3.jpg",
       "/images/gallery/gallery-tea.jpg",
-      "/images/gallery/gallery-tea-2.jpg",
       "/images/gallery/gallery-tea-3.jpg",
+      "/images/gallery/nuwara-gregory.jpg",
     ],
     featured: true,
     slideshow: true,
@@ -191,7 +192,7 @@ export const slideshowSlides = [
     caption: "Kandy · Sacred heritage",
   },
   {
-    src: "/images/destinations/nuwara-eliya-real-3.jpg",
+    src: "/images/destinations/nuwara-eliya-real-1.jpg",
     title: "Nuwara Eliya Tea Country",
     caption: "Misty highlands · Factory tours",
   },

@@ -3,18 +3,18 @@
 import Image from "next/image";
 import { useMemo, useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Images, X } from "lucide-react";
 import {
   galleryCategories,
-  showcaseGallery,
+  showcaseAlbums,
+  type ShowcaseAlbum,
   type GalleryCategory,
-  type ShowcaseImage,
+  type ShowcasePhoto,
 } from "@/lib/gallery";
 import { cn } from "@/lib/utils";
 
-type Item = ShowcaseImage & {
-  subtitle?: string;
-  /** CSS object-position for awkward crops */
+type AlbumView = ShowcaseAlbum & {
+  /** CSS object-position for cover */
   focus?: string;
 };
 
@@ -31,7 +31,6 @@ type Props = {
   }[];
 };
 
-/** Prefer subject framing for known landmarks that crop poorly at center-top */
 const FOCUS_BY_SRC: Record<string, string> = {
   "/images/gallery/gallery-ella.jpg": "center 65%",
   "/images/gallery/gallery-yala.jpg": "center 40%",
@@ -44,8 +43,11 @@ const FOCUS_BY_SRC: Record<string, string> = {
   "/images/gallery/gallery-tooth-2.jpg": "center 40%",
   "/images/gallery/gallery-tooth-3.jpg": "center 45%",
   "/images/gallery/gallery-tea.jpg": "center 45%",
-  "/images/gallery/gallery-tea-2.jpg": "center 35%",
+  "/images/gallery/gallery-tea-2.jpg": "center 40%",
   "/images/gallery/gallery-tea-3.jpg": "center 45%",
+  "/images/gallery/nuwara-gregory.jpg": "center 45%",
+  "/images/gallery/nuwara-tea-hills.jpg": "center 40%",
+  "/images/gallery/nuwara-post-office.jpg": "center 40%",
   "/images/gallery/gallery-beach.jpg": "center 55%",
   "/images/gallery/gallery-galle.jpg": "center 45%",
   "/images/gallery/gallery-dambulla.jpg": "center 40%",
@@ -62,12 +64,20 @@ const FOCUS_BY_SRC: Record<string, string> = {
   "/images/gallery/whale.jpg": "center 55%",
   "/images/gallery/unawatuna.jpg": "center 55%",
   "/images/gallery/jaffna.jpg": "center 40%",
-  "/images/gallery/tea-picker.jpg": "center 35%",
+  "/images/gallery/tea-picker.jpg": "center 40%",
   "/images/gallery/train-window.jpg": "center 45%",
 };
 
 function focusFor(src: string) {
   return FOCUS_BY_SRC[src] || "center center";
+}
+
+function slugifyPlace(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 48);
 }
 
 export function GalleryShowcase({ uploads = [] }: Props) {
@@ -76,7 +86,8 @@ export function GalleryShowcase({ uploads = [] }: Props) {
   const [filter, setFilter] = useState<GalleryCategory | "all">(
     galleryCategories.some((c) => c.id === initial) ? initial : "all",
   );
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [openAlbumId, setOpenAlbumId] = useState<string | null>(null);
+  const [photoIndex, setPhotoIndex] = useState(0);
 
   useEffect(() => {
     const f = searchParams.get("filter");
@@ -87,67 +98,128 @@ export function GalleryShowcase({ uploads = [] }: Props) {
 
   const teamCount = uploads.filter((u) => u.kind === "team").length;
 
-  const items = useMemo(() => {
+  const albums = useMemo(() => {
     const categoryIds = new Set(
       galleryCategories.map((c) => c.id).filter((id) => id !== "all"),
     );
 
-    const uploaded: Item[] = uploads.map((u) => {
-      const fromMeta =
-        (u.category && categoryIds.has(u.category as GalleryCategory)
-          ? (u.category as GalleryCategory)
-          : null) ||
-        (u.place && categoryIds.has(u.place as GalleryCategory)
-          ? (u.place as GalleryCategory)
-          : null) ||
-        (u.caption && categoryIds.has(u.caption as GalleryCategory)
-          ? (u.caption as GalleryCategory)
-          : null);
-      return {
+    const staticAlbums: AlbumView[] = showcaseAlbums.map((album) => ({
+      ...album,
+      photos: [...album.photos],
+      focus: focusFor(album.cover || album.photos[0]?.src || ""),
+    }));
+
+    const teamUploads = uploads.filter((u) => u.kind === "team");
+    const showcaseIds = new Set(
+      showcaseAlbums.flatMap((a) => a.photos.map((p) => p.id)),
+    );
+    const showcaseSrcs = new Set(
+      showcaseAlbums.flatMap((a) => a.photos.map((p) => p.src)),
+    );
+    const otherUploads = uploads.filter(
+      (u) =>
+        u.kind !== "team" &&
+        !showcaseIds.has(u.id) &&
+        !showcaseSrcs.has(u.src),
+    );
+
+    const tripGroups = new Map<string, AlbumView>();
+    for (const u of teamUploads) {
+      const place = (u.place || "").trim();
+      const key = place ? `trip-${slugifyPlace(place)}` : "album-trips";
+      const title = place || "Our trips";
+      const existing = tripGroups.get(key);
+      const photo: ShowcasePhoto = {
         id: u.id,
         src: u.src,
         title: u.title,
-        category:
-          u.kind === "team"
-            ? ("trips" as GalleryCategory)
-            : fromMeta || ("journey" as GalleryCategory),
-        span: "normal" as const,
-        focus: focusFor(u.src),
-        subtitle: [u.place, u.people, u.caption]
-          .filter((v) => v && !categoryIds.has(v as GalleryCategory))
-          .join(" · "),
       };
-    });
+      if (existing) {
+        existing.photos.push(photo);
+      } else {
+        tripGroups.set(key, {
+          id: key,
+          title,
+          category: "trips",
+          cover: u.src,
+          photos: [photo],
+          focus: focusFor(u.src),
+        });
+      }
+    }
 
-    const uploadSrcs = new Set(uploaded.map((u) => u.src));
-    const staticExtra: Item[] = showcaseGallery
-      .filter((s) => !uploadSrcs.has(s.src))
-      .map((s) => ({ ...s, focus: focusFor(s.src) }));
-    const merged = [...uploaded, ...staticExtra];
+    const curated: AlbumView[] = staticAlbums.filter(
+      (album) => album.photos.length > 0,
+    );
+
+    // General uploads: group by place title when available, else single album
+    const generalGroups = new Map<string, AlbumView>();
+    for (const u of otherUploads) {
+      const place = (u.place || u.title || "More photos").trim();
+      const key = `upload-${slugifyPlace(place) || u.id}`;
+      const fromMeta =
+        (u.category && categoryIds.has(u.category as GalleryCategory)
+          ? (u.category as GalleryCategory)
+          : null) || ("journey" as GalleryCategory);
+      const photo: ShowcasePhoto = { id: u.id, src: u.src, title: u.title };
+      const existing = generalGroups.get(key);
+      if (existing) {
+        existing.photos.push(photo);
+      } else {
+        generalGroups.set(key, {
+          id: key,
+          title: place,
+          category: fromMeta,
+          cover: u.src,
+          photos: [photo],
+          focus: focusFor(u.src),
+        });
+      }
+    }
+
+    const merged = [
+      ...Array.from(tripGroups.values()),
+      ...Array.from(generalGroups.values()),
+      ...curated,
+    ];
+
     if (filter === "all") return merged;
-    return merged.filter((i) => i.category === filter);
+    return merged.filter((a) => a.category === filter);
   }, [uploads, filter]);
 
-  const active = activeIndex != null ? items[activeIndex] : null;
+  const openAlbum = openAlbumId
+    ? albums.find((a) => a.id === openAlbumId) || null
+    : null;
+  const activePhoto =
+    openAlbum && openAlbum.photos.length > 0
+      ? openAlbum.photos[
+          ((photoIndex % openAlbum.photos.length) + openAlbum.photos.length) %
+            openAlbum.photos.length
+        ]
+      : null;
 
-  const openAt = useCallback((index: number) => {
-    setActiveIndex(index);
+  const openAt = useCallback((albumId: string, index = 0) => {
+    setOpenAlbumId(albumId);
+    setPhotoIndex(index);
   }, []);
 
-  const close = useCallback(() => setActiveIndex(null), []);
+  const close = useCallback(() => {
+    setOpenAlbumId(null);
+    setPhotoIndex(0);
+  }, []);
 
   const go = useCallback(
     (delta: number) => {
-      setActiveIndex((i) => {
-        if (i == null || items.length === 0) return i;
-        return (i + delta + items.length) % items.length;
-      });
+      if (!openAlbum || openAlbum.photos.length === 0) return;
+      setPhotoIndex(
+        (i) => (i + delta + openAlbum.photos.length) % openAlbum.photos.length,
+      );
     },
-    [items.length],
+    [openAlbum],
   );
 
   useEffect(() => {
-    if (activeIndex == null) return;
+    if (!openAlbum) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") close();
       if (e.key === "ArrowLeft") go(-1);
@@ -160,11 +232,11 @@ export function GalleryShowcase({ uploads = [] }: Props) {
       window.removeEventListener("keydown", onKey);
       document.body.style.overflow = prev;
     };
-  }, [activeIndex, close, go]);
+  }, [openAlbum, close, go]);
 
-  // Keep index valid when filter changes
   useEffect(() => {
-    setActiveIndex(null);
+    setOpenAlbumId(null);
+    setPhotoIndex(0);
   }, [filter]);
 
   return (
@@ -211,58 +283,74 @@ export function GalleryShowcase({ uploads = [] }: Props) {
       )}
 
       <div className="mt-8 grid auto-rows-[200px] grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 lg:auto-rows-[220px]">
-        {items.map((img, index) => (
-          <button
-            key={img.id}
-            type="button"
-            onClick={() => openAt(index)}
-            className={cn(
-              "group relative overflow-hidden rounded-2xl border border-line bg-mist/40 text-left shadow-sm",
-              img.span === "wide" && "col-span-2",
-              img.span === "tall" && "row-span-2",
-            )}
-          >
-            <Image
-              src={img.src}
-              alt={img.title}
-              fill
-              className="object-cover transition duration-700 group-hover:scale-105"
-              style={{ objectPosition: img.focus || focusFor(img.src) }}
-              sizes="(max-width: 768px) 50vw, 25vw"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-jungle/85 via-jungle/15 to-transparent opacity-95" />
-            <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-sun">
-                {img.category === "trips" ? "Our trips" : img.category}
-              </p>
-              <p className="mt-0.5 font-display text-sm leading-snug text-foam sm:text-base">
-                {img.title}
-              </p>
-            </div>
-          </button>
-        ))}
+        {albums.map((album) => {
+          const coverSrc = album.cover || album.photos[0]?.src;
+          if (!coverSrc) return null;
+          const count = album.photos.length;
+          return (
+            <button
+              key={album.id}
+              type="button"
+              onClick={() => openAt(album.id, 0)}
+              className={cn(
+                "group relative overflow-hidden rounded-2xl border border-line bg-mist/40 text-left shadow-sm",
+                album.span === "wide" && "col-span-2",
+                album.span === "tall" && "row-span-2",
+              )}
+            >
+              <Image
+                src={coverSrc}
+                alt={album.title}
+                fill
+                className="object-cover transition duration-700 group-hover:scale-105"
+                style={{ objectPosition: album.focus || focusFor(coverSrc) }}
+                sizes="(max-width: 768px) 50vw, 25vw"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-jungle/85 via-jungle/15 to-transparent opacity-95" />
+              {count > 1 && (
+                <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-jungle/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-foam backdrop-blur">
+                  <Images className="h-3 w-3" />
+                  {count} photos
+                </span>
+              )}
+              <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-sun">
+                  {album.category === "trips" ? "Our trips" : album.category}
+                </p>
+                <p className="mt-0.5 font-display text-sm leading-snug text-foam sm:text-base">
+                  {album.title}
+                </p>
+              </div>
+            </button>
+          );
+        })}
       </div>
 
-      {active && activeIndex != null && (
+      {openAlbum && activePhoto && (
         <div
           className="fixed inset-0 z-[80] flex items-center justify-center bg-jungle/90 p-3 backdrop-blur-md sm:p-6"
           onClick={close}
           role="dialog"
           aria-modal="true"
-          aria-label="Gallery slideshow"
+          aria-label={`${openAlbum.title} album`}
         >
           <div
             className="relative flex w-full max-w-5xl flex-col overflow-hidden rounded-[1.25rem] bg-foam shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3 sm:px-5">
-              <p className="text-xs text-muted sm:text-sm">
-                {activeIndex + 1} / {items.length}
-                <span className="mx-2 text-line">·</span>
-                <span className="capitalize text-lagoon">
-                  {active.category === "trips" ? "Our trips" : active.category}
-                </span>
-              </p>
+              <div>
+                <p className="font-display text-base text-jungle sm:text-lg">
+                  {openAlbum.title}
+                </p>
+                <p className="text-xs text-muted sm:text-sm">
+                  {photoIndex + 1} / {openAlbum.photos.length}
+                  <span className="mx-2 text-line">·</span>
+                  <span className="capitalize text-lagoon">
+                    {openAlbum.category === "trips" ? "Our trips" : openAlbum.category}
+                  </span>
+                </p>
+              </div>
               <button
                 type="button"
                 onClick={close}
@@ -276,8 +364,8 @@ export function GalleryShowcase({ uploads = [] }: Props) {
             <div className="relative bg-jungle">
               <div className="relative mx-auto aspect-[16/10] w-full max-h-[70vh]">
                 <Image
-                  src={active.src}
-                  alt={active.title}
+                  src={activePhoto.src}
+                  alt={activePhoto.title || openAlbum.title}
                   fill
                   className="object-contain"
                   sizes="(max-width: 1024px) 100vw, 960px"
@@ -285,7 +373,7 @@ export function GalleryShowcase({ uploads = [] }: Props) {
                 />
               </div>
 
-              {items.length > 1 && (
+              {openAlbum.photos.length > 1 && (
                 <>
                   <button
                     type="button"
@@ -309,27 +397,24 @@ export function GalleryShowcase({ uploads = [] }: Props) {
 
             <div className="px-4 py-4 sm:px-6 sm:py-5">
               <h3 className="font-display text-xl text-jungle sm:text-2xl">
-                {active.title}
+                {activePhoto.title || openAlbum.title}
               </h3>
-              {active.subtitle && (
-                <p className="mt-1 text-sm text-muted">{active.subtitle}</p>
-              )}
 
-              {items.length > 1 && (
+              {openAlbum.photos.length > 1 && (
                 <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
-                  {items.map((img, i) => (
+                  {openAlbum.photos.map((img: ShowcasePhoto, i: number) => (
                     <button
                       key={img.id}
                       type="button"
-                      onClick={() => setActiveIndex(i)}
+                      onClick={() => setPhotoIndex(i)}
                       className={cn(
                         "relative h-14 w-20 shrink-0 overflow-hidden rounded-lg border-2 transition",
-                        i === activeIndex
+                        i === photoIndex
                           ? "border-sun"
                           : "border-transparent opacity-70 hover:opacity-100",
                       )}
-                      aria-label={`Go to ${img.title}`}
-                      aria-current={i === activeIndex}
+                      aria-label={`Go to ${img.title || openAlbum.title}`}
+                      aria-current={i === photoIndex}
                     >
                       <Image
                         src={img.src}

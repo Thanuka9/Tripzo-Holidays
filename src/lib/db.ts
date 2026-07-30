@@ -378,13 +378,20 @@ export async function ensureDefaultHeroSlides() {
 
 /** Seed curated Sri Lanka showcase photos so they appear in admin Images */
 export async function ensureShowcaseGallery() {
-  const { showcaseGallery } = await import("./gallery");
+  const { showcaseGallery, showcaseAlbums } = await import("./gallery");
   let gallery = await getGallery();
   const byId = new Map(gallery.map((g) => [g.id, g]));
   let changed = false;
 
+  const albumTitleById = new Map(
+    showcaseAlbums.flatMap((album) =>
+      album.photos.map((photo) => [photo.id, album.title] as const),
+    ),
+  );
+
   for (const [i, s] of showcaseGallery.entries()) {
     const existing = byId.get(s.id);
+    const albumTitle = albumTitleById.get(s.id) || s.title;
     if (!existing) {
       byId.set(s.id, {
         id: s.id,
@@ -392,7 +399,7 @@ export async function ensureShowcaseGallery() {
         title: s.title,
         kind: "general",
         category: s.category,
-        place: s.category,
+        place: albumTitle,
         caption: s.category,
         sortOrder: i,
         featured: i === 0,
@@ -401,13 +408,17 @@ export async function ensureShowcaseGallery() {
       changed = true;
       continue;
     }
-    if (existing.src !== s.src || existing.title !== s.title) {
+    if (
+      existing.src !== s.src ||
+      existing.title !== s.title ||
+      existing.place !== albumTitle
+    ) {
       byId.set(s.id, {
         ...existing,
         src: s.src,
         title: s.title,
         category: s.category,
-        place: s.category,
+        place: albumTitle,
       });
       changed = true;
     }

@@ -6,220 +6,248 @@ export type GalleryCategory =
   | "journey"
   | "trips";
 
+export type ShowcasePhoto = {
+  id: string;
+  src: string;
+  title?: string;
+};
+
+export type ShowcaseAlbum = {
+  id: string;
+  title: string;
+  category: GalleryCategory;
+  cover: string;
+  span?: "tall" | "wide" | "normal";
+  photos: ShowcasePhoto[];
+};
+
+/** @deprecated Prefer ShowcaseAlbum; kept for seed/admin flat rows */
 export type ShowcaseImage = {
   id: string;
   src: string;
   title: string;
   category: GalleryCategory;
   span?: "tall" | "wide" | "normal";
+  albumId?: string;
 };
 
-/** Curated Sri Lanka showcase. Multiple photos per place open in the lightbox slideshow. */
-export const showcaseGallery: ShowcaseImage[] = [
-  // Sigiriya (multiple)
+/** Place albums - one cover on the gallery grid, photos open inside the album. */
+export const showcaseAlbums: ShowcaseAlbum[] = [
   {
-    id: "sg-sigiriya",
-    src: "/images/gallery/gallery-sigiriya.jpg",
+    id: "album-sigiriya",
     title: "Sigiriya Lion Rock",
     category: "heritage",
+    cover: "/images/gallery/gallery-sigiriya.jpg",
     span: "wide",
+    photos: [
+      { id: "sg-sigiriya", src: "/images/gallery/gallery-sigiriya.jpg", title: "Sigiriya Lion Rock" },
+      { id: "sg-sigiriya-2", src: "/images/gallery/gallery-sigiriya-2.jpg", title: "Sigiriya Lion Rock" },
+      { id: "sg-sigiriya-3", src: "/images/gallery/gallery-sigiriya-3.jpg", title: "Sigiriya from the hills" },
+      { id: "sg-sigiriya-4", src: "/images/gallery/gallery-sigiriya-4.jpg", title: "Sigiriya Rock Fortress" },
+    ],
   },
   {
-    id: "sg-sigiriya-2",
-    src: "/images/gallery/gallery-sigiriya-2.jpg",
-    title: "Sigiriya Lion Rock",
+    id: "album-tooth",
+    title: "Temple of the Tooth",
     category: "heritage",
+    cover: "/images/gallery/gallery-tooth.jpg",
+    photos: [
+      { id: "sg-tooth", src: "/images/gallery/gallery-tooth.jpg", title: "Temple of the Tooth, Kandy" },
+      { id: "sg-tooth-2", src: "/images/gallery/gallery-tooth-2.jpg", title: "Temple of the Tooth, Kandy" },
+      { id: "sg-tooth-3", src: "/images/gallery/gallery-tooth-3.jpg", title: "Sri Dalada Maligawa" },
+    ],
   },
   {
-    id: "sg-sigiriya-3",
-    src: "/images/gallery/gallery-sigiriya-3.jpg",
-    title: "Sigiriya from the hills",
-    category: "heritage",
-  },
-  {
-    id: "sg-sigiriya-4",
-    src: "/images/gallery/gallery-sigiriya-4.jpg",
-    title: "Sigiriya Rock Fortress",
-    category: "heritage",
-  },
-  // Temple of the Tooth (multiple)
-  {
-    id: "sg-tooth",
-    src: "/images/gallery/gallery-tooth.jpg",
-    title: "Temple of the Tooth, Kandy",
-    category: "heritage",
-  },
-  {
-    id: "sg-tooth-2",
-    src: "/images/gallery/gallery-tooth-2.jpg",
-    title: "Temple of the Tooth, Kandy",
-    category: "heritage",
-  },
-  {
-    id: "sg-tooth-3",
-    src: "/images/gallery/gallery-tooth-3.jpg",
-    title: "Sri Dalada Maligawa",
-    category: "heritage",
-  },
-  // Nuwara Eliya / tea (multiple)
-  {
-    id: "sg-tea",
-    src: "/images/gallery/gallery-tea.jpg",
-    title: "Nuwara Eliya tea estates",
+    id: "album-nuwara-eliya",
+    title: "Nuwara Eliya",
     category: "hills",
+    cover: "/images/gallery/gallery-tea.jpg",
     span: "tall",
+    photos: [
+      { id: "sg-tea", src: "/images/gallery/gallery-tea.jpg", title: "Tea estates, Nuwara Eliya" },
+      { id: "sg-tea-2", src: "/images/gallery/gallery-tea-2.jpg", title: "Tea pluckers in the hills" },
+      { id: "sg-tea-3", src: "/images/gallery/gallery-tea-3.jpg", title: "Gregory Lake" },
+      { id: "sg-nuwara-gregory", src: "/images/gallery/nuwara-gregory.jpg", title: "Lake Gregory at dusk" },
+      { id: "sg-nuwara-hills", src: "/images/gallery/nuwara-tea-hills.jpg", title: "Highland tea hills" },
+      { id: "sg-tea-picker", src: "/images/gallery/tea-picker.jpg", title: "Among the tea bushes" },
+      { id: "sg-nuwara-post", src: "/images/gallery/nuwara-post-office.jpg", title: "Nuwara Eliya Post Office" },
+      {
+        id: "sg-nuwara-town",
+        src: "/images/destinations/nuwara-eliya-real-2.webp",
+        title: "Nuwara Eliya town",
+      },
+    ],
   },
   {
-    id: "sg-tea-2",
-    src: "/images/gallery/gallery-tea-2.jpg",
-    title: "Nuwara Eliya tea estates",
+    id: "album-ella",
+    title: "Ella & Nine Arch Bridge",
     category: "hills",
-  },
-  {
-    id: "sg-tea-3",
-    src: "/images/gallery/gallery-tea-3.jpg",
-    title: "Tea country, Nuwara Eliya",
-    category: "hills",
-  },
-  {
-    id: "sg-tea-picker",
-    src: "/images/gallery/tea-picker.jpg",
-    title: "Tea country life",
-    category: "hills",
-  },
-  // Ella
-  {
-    id: "sg-ella",
-    src: "/images/gallery/gallery-ella.jpg",
-    title: "Nine Arch Bridge, Ella",
-    category: "hills",
+    cover: "/images/gallery/gallery-ella.jpg",
     span: "wide",
+    photos: [
+      { id: "sg-ella", src: "/images/gallery/gallery-ella.jpg", title: "Nine Arch Bridge, Ella" },
+      { id: "sg-ravana", src: "/images/gallery/ravana-falls.jpg", title: "Ravana Falls" },
+    ],
   },
   {
-    id: "sg-ravana",
-    src: "/images/gallery/ravana-falls.jpg",
-    title: "Ravana Falls",
-    category: "hills",
-  },
-  // Wildlife
-  {
-    id: "sg-yala",
-    src: "/images/gallery/gallery-yala.jpg",
+    id: "album-yala",
     title: "Yala National Park",
     category: "wildlife",
+    cover: "/images/gallery/gallery-yala.jpg",
+    photos: [
+      { id: "sg-yala", src: "/images/gallery/gallery-yala.jpg", title: "Yala National Park" },
+    ],
   },
   {
-    id: "sg-udawalawe",
-    src: "/images/gallery/udawalawe.jpg",
-    title: "Udawalawe elephants",
+    id: "album-udawalawe",
+    title: "Udawalawe",
     category: "wildlife",
+    cover: "/images/gallery/udawalawe.jpg",
     span: "wide",
+    photos: [
+      { id: "sg-udawalawe", src: "/images/gallery/udawalawe.jpg", title: "Udawalawe elephants" },
+    ],
   },
   {
-    id: "sg-pinnawala",
-    src: "/images/gallery/gallery-pinnawala.jpg",
-    title: "Pinnawala elephants",
+    id: "album-pinnawala",
+    title: "Pinnawala",
     category: "wildlife",
+    cover: "/images/gallery/gallery-pinnawala.jpg",
+    photos: [
+      { id: "sg-pinnawala", src: "/images/gallery/gallery-pinnawala.jpg", title: "Pinnawala elephants" },
+    ],
   },
-  // Heritage / cities
   {
-    id: "sg-galle",
-    src: "/images/gallery/gallery-galle.jpg",
+    id: "album-galle",
     title: "Galle Dutch Fort",
     category: "heritage",
+    cover: "/images/gallery/gallery-galle.jpg",
+    photos: [
+      { id: "sg-galle", src: "/images/gallery/gallery-galle.jpg", title: "Galle Dutch Fort" },
+    ],
   },
   {
-    id: "sg-dambulla",
-    src: "/images/gallery/gallery-dambulla.jpg",
+    id: "album-dambulla",
     title: "Dambulla Cave Temple",
     category: "heritage",
+    cover: "/images/gallery/gallery-dambulla.jpg",
+    photos: [
+      { id: "sg-dambulla", src: "/images/gallery/gallery-dambulla.jpg", title: "Dambulla Cave Temple" },
+    ],
   },
   {
-    id: "sg-kandy",
-    src: "/images/gallery/gallery-kandy.jpg",
+    id: "album-kandy",
     title: "Kandy Lake",
     category: "heritage",
+    cover: "/images/gallery/gallery-kandy.jpg",
+    photos: [
+      { id: "sg-kandy", src: "/images/gallery/gallery-kandy.jpg", title: "Kandy Lake" },
+    ],
   },
   {
-    id: "sg-polonnaruwa",
-    src: "/images/gallery/polonnaruwa.jpg",
-    title: "Polonnaruwa Vatadage",
+    id: "album-polonnaruwa",
+    title: "Polonnaruwa",
     category: "heritage",
+    cover: "/images/gallery/polonnaruwa.jpg",
+    photos: [
+      { id: "sg-polonnaruwa", src: "/images/gallery/polonnaruwa.jpg", title: "Polonnaruwa Vatadage" },
+    ],
   },
   {
-    id: "sg-anuradhapura",
-    src: "/images/gallery/anuradhapura.jpg",
-    title: "Ruwanwelisaya, Anuradhapura",
+    id: "album-anuradhapura",
+    title: "Anuradhapura",
     category: "heritage",
+    cover: "/images/gallery/anuradhapura.jpg",
+    photos: [
+      {
+        id: "sg-anuradhapura",
+        src: "/images/gallery/anuradhapura.jpg",
+        title: "Ruwanwelisaya, Anuradhapura",
+      },
+    ],
   },
   {
-    id: "sg-jaffna",
-    src: "/images/gallery/jaffna.jpg",
-    title: "Nallur Temple, Jaffna",
+    id: "album-jaffna",
+    title: "Jaffna",
     category: "heritage",
+    cover: "/images/gallery/jaffna.jpg",
+    photos: [
+      { id: "sg-jaffna", src: "/images/gallery/jaffna.jpg", title: "Nallur Temple, Jaffna" },
+    ],
   },
-  // Hills
   {
-    id: "sg-horton",
-    src: "/images/gallery/horton.jpg",
+    id: "album-horton",
     title: "Horton Plains",
     category: "hills",
+    cover: "/images/gallery/horton.jpg",
+    photos: [
+      { id: "sg-horton", src: "/images/gallery/horton.jpg", title: "Horton Plains" },
+    ],
   },
   {
-    id: "sg-adam",
-    src: "/images/gallery/adam-peak.jpg",
+    id: "album-adam",
     title: "Adam's Peak",
     category: "hills",
+    cover: "/images/gallery/adam-peak.jpg",
+    photos: [
+      { id: "sg-adam", src: "/images/gallery/adam-peak.jpg", title: "Adam's Peak" },
+    ],
   },
   {
-    id: "sg-mist",
-    src: "/images/gallery/mist-hills.jpg",
-    title: "Highland mist over tea country",
+    id: "album-mist",
+    title: "Highland mist",
     category: "hills",
+    cover: "/images/gallery/mist-hills.jpg",
     span: "tall",
+    photos: [
+      {
+        id: "sg-mist",
+        src: "/images/gallery/mist-hills.jpg",
+        title: "Highland mist over tea country",
+      },
+    ],
   },
-  // Beach
   {
-    id: "sg-beach",
-    src: "/images/gallery/gallery-beach.jpg",
+    id: "album-south-coast",
     title: "Southern coastline",
     category: "beach",
+    cover: "/images/gallery/gallery-beach.jpg",
     span: "wide",
+    photos: [
+      { id: "sg-beach", src: "/images/gallery/gallery-beach.jpg", title: "Southern coastline" },
+      { id: "sg-unawatuna", src: "/images/gallery/unawatuna.jpg", title: "Unawatuna Beach" },
+      { id: "sg-stilt", src: "/images/gallery/stilt-fishermen.jpg", title: "Stilt fishermen" },
+      { id: "sg-whale", src: "/images/gallery/whale.jpg", title: "Whale watching waters" },
+    ],
   },
   {
-    id: "sg-unawatuna",
-    src: "/images/gallery/unawatuna.jpg",
-    title: "Unawatuna Beach",
-    category: "beach",
-  },
-  {
-    id: "sg-stilt",
-    src: "/images/gallery/stilt-fishermen.jpg",
-    title: "Stilt fishermen",
-    category: "beach",
-  },
-  {
-    id: "sg-whale",
-    src: "/images/gallery/whale.jpg",
-    title: "Whale watching waters",
-    category: "beach",
-    span: "wide",
-  },
-  // Journey
-  {
-    id: "sg-train",
-    src: "/images/gallery/train-hills.jpg",
-    title: "Scenic hill-country train",
+    id: "album-train",
+    title: "Hill-country train",
     category: "journey",
+    cover: "/images/gallery/train-hills.jpg",
     span: "wide",
-  },
-  {
-    id: "sg-train-window",
-    src: "/images/gallery/train-window.jpg",
-    title: "Through the carriage window",
-    category: "journey",
+    photos: [
+      { id: "sg-train", src: "/images/gallery/train-hills.jpg", title: "Scenic hill-country train" },
+      {
+        id: "sg-train-window",
+        src: "/images/gallery/train-window.jpg",
+        title: "Through the carriage window",
+      },
+    ],
   },
 ];
+
+/** Flat list for admin seeding (one row per photo). */
+export const showcaseGallery: ShowcaseImage[] = showcaseAlbums.flatMap((album) =>
+  album.photos.map((photo, index) => ({
+    id: photo.id,
+    src: photo.src,
+    title: photo.title || album.title,
+    category: album.category,
+    span: index === 0 ? album.span : undefined,
+    albumId: album.id,
+  })),
+);
 
 export const galleryCategories: { id: GalleryCategory | "all"; label: string }[] = [
   { id: "all", label: "All" },
