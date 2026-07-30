@@ -64,7 +64,8 @@ export function Header() {
         )}
       >
         <div className="mx-auto flex h-[var(--site-header-height)] max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
-          <BrandLogo onDark={!solid} size="md" />
+          {/* Compact mark in the bar — hero uses a text wordmark instead of a second logo plate */}
+          <BrandLogo onDark={!solid} size="sm" />
 
           <nav className="hidden items-center gap-0.5 lg:flex">
             {links.map((link) => {

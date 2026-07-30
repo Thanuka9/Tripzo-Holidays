@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { slideshowSlides } from "@/lib/destinations";
 import { SITE } from "@/lib/constants";
-import { BrandLogo } from "@/components/BrandLogo";
 import { cn } from "@/lib/utils";
 
 export type HeroSlide = {
@@ -63,16 +62,14 @@ export function HeroSlideshow({
       <div className="absolute inset-0 bg-gradient-to-r from-jungle/90 via-jungle/55 to-transparent" />
       <div className="absolute inset-0 bg-gradient-to-t from-jungle/80 via-transparent to-jungle/50" />
 
-      <div className="relative mx-auto flex min-h-[85vh] max-w-6xl flex-col justify-end px-4 pb-24 pt-[calc(var(--site-header-height)+1.5rem)] sm:min-h-[92vh] sm:px-6 sm:pb-20 sm:pt-[calc(var(--site-header-height)+2rem)]">
-        <BrandLogo
-          onDark
-          size="lg"
-          className="mb-8 origin-left scale-[1.2] sm:mb-12 sm:scale-[1.6]"
-        />
-        <p className="mt-1 text-xs uppercase tracking-[0.28em] text-foam/80 sm:text-sm">
+      <div className="relative mx-auto flex min-h-[85vh] max-w-6xl flex-col justify-end px-4 pb-24 pt-[calc(var(--site-header-height)+2.5rem)] sm:min-h-[92vh] sm:px-6 sm:pb-20 sm:pt-[calc(var(--site-header-height)+3rem)]">
+        <p className="text-xs uppercase tracking-[0.28em] text-foam/80 sm:text-sm">
           Sri Lanka · Tours & Transport
         </p>
-        <h1 className="mt-4 max-w-2xl font-display text-[1.75rem] font-medium leading-tight text-foam text-balance sm:mt-6 sm:text-4xl md:text-5xl">
+        <p className="mt-3 font-display text-2xl font-medium tracking-tight text-sun sm:mt-4 sm:text-3xl md:text-4xl">
+          Tripzo Holidays
+        </p>
+        <h1 className="mt-3 max-w-2xl font-display text-[1.75rem] font-medium leading-tight text-foam text-balance sm:mt-4 sm:text-4xl md:text-5xl">
           Every journey, smooth and unforgettable
         </h1>
         <p className="mt-3 max-w-xl text-sm leading-relaxed text-foam/85 sm:mt-4 sm:text-lg">
