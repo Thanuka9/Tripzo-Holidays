@@ -29,8 +29,8 @@ export default async function TourDetailPage({ params }: Props) {
     <div>
       <section className="relative min-h-[52vh] overflow-hidden">
         <Image src={tour.image} alt={tour.title} fill priority className="object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-jungle via-jungle/50 to-jungle/20" />
-        <div className="relative mx-auto flex min-h-[52vh] max-w-6xl flex-col justify-end px-4 pb-12 sm:px-6">
+        <div className="absolute inset-0 bg-gradient-to-t from-jungle via-jungle/50 to-jungle/45" />
+        <div className="relative mx-auto flex min-h-[52vh] max-w-6xl flex-col justify-end px-4 pb-12 pt-[var(--site-header-height)] sm:px-6">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-sun">
             {tour.duration}
           </p>

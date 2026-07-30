@@ -23,6 +23,7 @@ type Props = {
     place?: string;
     people?: string;
     caption?: string;
+    category?: string;
   }[];
 };
 
@@ -44,15 +45,40 @@ export function GalleryShowcase({ uploads = [] }: Props) {
   const teamCount = uploads.filter((u) => u.kind === "team").length;
 
   const items = useMemo(() => {
-    const uploaded: Item[] = uploads.map((u) => ({
-      id: u.id,
-      src: u.src,
-      title: u.title,
-      category: (u.kind === "team" ? "trips" : "journey") as GalleryCategory,
-      span: "normal" as const,
-      subtitle: [u.place, u.people, u.caption].filter(Boolean).join(" · "),
-    }));
-    const merged = [...uploaded, ...showcaseGallery];
+    const categoryIds = new Set(
+      galleryCategories.map((c) => c.id).filter((id) => id !== "all"),
+    );
+
+    const uploaded: Item[] = uploads.map((u) => {
+      const fromMeta =
+        (u.category && categoryIds.has(u.category as GalleryCategory)
+          ? (u.category as GalleryCategory)
+          : null) ||
+        (u.place && categoryIds.has(u.place as GalleryCategory)
+          ? (u.place as GalleryCategory)
+          : null) ||
+        (u.caption && categoryIds.has(u.caption as GalleryCategory)
+          ? (u.caption as GalleryCategory)
+          : null);
+      return {
+        id: u.id,
+        src: u.src,
+        title: u.title,
+        category:
+          u.kind === "team"
+            ? ("trips" as GalleryCategory)
+            : fromMeta || ("journey" as GalleryCategory),
+        span: "normal" as const,
+        subtitle: [u.place, u.people, u.caption]
+          .filter((v) => v && !categoryIds.has(v as GalleryCategory))
+          .join(" · "),
+      };
+    });
+
+    const uploadSrcs = new Set(uploaded.map((u) => u.src));
+    // Avoid duplicates once Sri Lanka showcase is seeded into admin/DB
+    const staticExtra = showcaseGallery.filter((s) => !uploadSrcs.has(s.src));
+    const merged = [...uploaded, ...staticExtra];
     if (filter === "all") return merged;
     return merged.filter((i) => i.category === filter);
   }, [uploads, filter]);

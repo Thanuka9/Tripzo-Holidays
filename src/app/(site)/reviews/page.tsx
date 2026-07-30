@@ -17,7 +17,7 @@ export default async function ReviewsPage() {
 
   return (
     <div>
-      <section className="bg-jungle px-4 py-16 text-foam sm:px-6">
+      <section className="bg-jungle px-4 pb-16 pt-[calc(var(--site-header-height)+2.5rem)] text-foam sm:px-6 sm:pb-16 sm:pt-[calc(var(--site-header-height)+3rem)]">
         <div className="mx-auto max-w-6xl">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-sun">
             Google · 4.8 ★

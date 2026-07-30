@@ -37,8 +37,8 @@ export default async function GalleryPage() {
           priority
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-jungle via-jungle/55 to-jungle/25" />
-        <div className="relative mx-auto flex min-h-[42vh] max-w-6xl flex-col justify-end px-4 pb-12 sm:px-6">
+        <div className="absolute inset-0 bg-gradient-to-t from-jungle via-jungle/55 to-jungle/45" />
+        <div className="relative mx-auto flex min-h-[42vh] max-w-6xl flex-col justify-end px-4 pb-12 pt-[var(--site-header-height)] sm:px-6">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-sun">
             Visual journey
           </p>
@@ -67,6 +67,7 @@ export default async function GalleryPage() {
                 place: g.place,
                 people: g.people,
                 caption: g.caption,
+                category: g.category,
               }))}
             />
           </Suspense>

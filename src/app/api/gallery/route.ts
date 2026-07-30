@@ -7,6 +7,7 @@ import {
   addGalleryImage,
   deleteGalleryImage,
   ensureDefaultHeroSlides,
+  ensureShowcaseGallery,
   getGallery,
   reorderGallery,
   setGalleryMain,
@@ -26,6 +27,7 @@ async function saveUpload(file: File) {
 
 export async function GET() {
   await ensureDefaultHeroSlides();
+  await ensureShowcaseGallery();
   const gallery = await getGallery();
   return NextResponse.json({ gallery });
 }

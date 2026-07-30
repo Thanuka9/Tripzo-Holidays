@@ -34,6 +34,8 @@ export type GalleryImage = {
   place?: string;
   people?: string;
   kind?: GalleryKind;
+  /** Public gallery filter category (heritage, hills, etc.) */
+  category?: string;
   sortOrder?: number;
   /** Cover / lead image within its kind (hero, team, or general) */
   featured?: boolean;
@@ -275,6 +277,7 @@ export async function updateGalleryImage(
       | "src"
       | "sortOrder"
       | "featured"
+      | "category"
     >
   >,
 ) {
@@ -336,6 +339,39 @@ export async function ensureDefaultHeroSlides() {
     createdAt: new Date().toISOString(),
   }));
   const next = [...seeded, ...gallery];
+  try {
+    await writeJson("gallery.json", next);
+  } catch {
+    return sortGallery(next);
+  }
+  return sortGallery(next);
+}
+
+/** Seed curated Sri Lanka showcase photos so they appear in admin Images */
+export async function ensureShowcaseGallery() {
+  const { showcaseGallery } = await import("./gallery");
+  const gallery = await getGallery();
+  const existingIds = new Set(gallery.map((g) => g.id));
+  const existingSrcs = new Set(gallery.map((g) => g.src));
+
+  const missing = showcaseGallery.filter(
+    (s) => !existingIds.has(s.id) && !existingSrcs.has(s.src),
+  );
+  if (missing.length === 0) return gallery;
+
+  const seeded: GalleryImage[] = missing.map((s, i) => ({
+    id: s.id,
+    src: s.src,
+    title: s.title,
+    kind: "general" as const,
+    category: s.category,
+    place: s.category,
+    caption: s.category,
+    sortOrder: i,
+    featured: i === 0,
+    createdAt: new Date().toISOString(),
+  }));
+  const next = [...gallery, ...seeded];
   try {
     await writeJson("gallery.json", next);
   } catch {
@@ -503,24 +539,94 @@ export async function reorderFleet(orderedIds: string[]) {
 export async function getDestinations() {
   const seeded = defaultDestinations.map((d) => ({
     ...d,
+    gallery: d.gallery?.length ? d.gallery : [d.image],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   }));
-  return readJson<DestinationRecord[]>("destinations.json", seeded);
+  const stored = await readJson<DestinationRecord[]>(
+    "destinations.json",
+    seeded,
+  );
+  const defaults = new Map(defaultDestinations.map((d) => [d.id, d]));
+
+  return stored.map((d) => {
+    const def = defaults.get(d.id);
+    if (d.gallery && d.gallery.length > 0) {
+      return { ...d, image: d.image || d.gallery[0] };
+    }
+    if (def?.gallery?.length) {
+      return {
+        ...d,
+        image: def.image,
+        gallery: def.gallery,
+      };
+    }
+    return {
+      ...d,
+      gallery: d.image ? [d.image] : [],
+    };
+  });
 }
 
 export async function upsertDestination(destination: Destination) {
   const list = await getDestinations();
   const idx = list.findIndex((d) => d.id === destination.id);
+  const existing = idx >= 0 ? list[idx] : null;
+  const gallery =
+    destination.gallery ??
+    existing?.gallery ??
+    (destination.image ? [destination.image] : []);
   const record: DestinationRecord = {
     ...destination,
-    createdAt: idx >= 0 ? list[idx].createdAt : new Date().toISOString(),
+    gallery,
+    image: destination.image || gallery[0] || existing?.image || "",
+    createdAt: existing?.createdAt || new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
   if (idx >= 0) list[idx] = record;
   else list.push(record);
   await writeJson("destinations.json", list);
   return record;
+}
+
+export async function updateDestinationGallery(
+  id: string,
+  gallery: string[],
+  mainImage?: string,
+) {
+  const list = await getDestinations();
+  const idx = list.findIndex((d) => d.id === id);
+  if (idx === -1) return null;
+  const nextGallery = gallery.filter(Boolean);
+  const currentMain = list[idx].image;
+  const image =
+    (mainImage && nextGallery.includes(mainImage) && mainImage) ||
+    (nextGallery.includes(currentMain) && currentMain) ||
+    nextGallery[0] ||
+    currentMain;
+  list[idx] = {
+    ...list[idx],
+    gallery: nextGallery,
+    image,
+    updatedAt: new Date().toISOString(),
+  };
+  await writeJson("destinations.json", list);
+  return list[idx];
+}
+
+export async function addDestinationGalleryImage(id: string, src: string) {
+  const list = await getDestinations();
+  const idx = list.findIndex((d) => d.id === id);
+  if (idx === -1) return null;
+  const gallery = [...(list[idx].gallery || [list[idx].image]), src];
+  list[idx] = {
+    ...list[idx],
+    gallery,
+    image: list[idx].image || src,
+    updatedAt: new Date().toISOString(),
+  };
+  await writeJson("destinations.json", list);
+  return list[idx];
 }
 
 export async function deleteDestination(id: string) {
@@ -590,6 +696,7 @@ export async function getTeamPhotos() {
 }
 
 export async function getPublicGalleryUploads() {
+  await ensureShowcaseGallery();
   const gallery = await getGallery();
   return gallery.filter((g) => g.kind !== "hero");
 }

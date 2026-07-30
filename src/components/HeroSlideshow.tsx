@@ -61,9 +61,9 @@ export function HeroSlideshow({
       ))}
 
       <div className="absolute inset-0 bg-gradient-to-r from-jungle/90 via-jungle/55 to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-t from-jungle/80 via-transparent to-jungle/30" />
+      <div className="absolute inset-0 bg-gradient-to-t from-jungle/80 via-transparent to-jungle/50" />
 
-      <div className="relative mx-auto flex min-h-[85vh] max-w-6xl flex-col justify-end px-4 pb-24 pt-24 sm:min-h-[92vh] sm:px-6 sm:pb-20 sm:pt-28">
+      <div className="relative mx-auto flex min-h-[85vh] max-w-6xl flex-col justify-end px-4 pb-24 pt-[calc(var(--site-header-height)+1.5rem)] sm:min-h-[92vh] sm:px-6 sm:pb-20 sm:pt-[calc(var(--site-header-height)+2rem)]">
         <BrandLogo
           onDark
           size="lg"

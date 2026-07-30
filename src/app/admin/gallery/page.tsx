@@ -201,7 +201,7 @@ export default function AdminGalleryPage() {
           [
             ["hero", "Hero slideshow"],
             ["team", "Team trip photos"],
-            ["general", "Gallery uploads"],
+            ["general", "Sri Lanka gallery"],
           ] as const
         ).map(([id, label]) => (
           <button
@@ -319,11 +319,13 @@ export default function AdminGalleryPage() {
                 ? "Hero slideshow"
                 : kind === "team"
                   ? "Team trip photos"
-                  : "Gallery uploads"}{" "}
+                  : "Sri Lanka gallery"}{" "}
               ({items.length})
             </h2>
             <p className="mt-1 text-xs text-zinc-500">
-              Reorder with ← → · Set main cover · Replace or remove
+              {kind === "general"
+                ? "Curated island photos plus your uploads — reorder, set main, replace, remove"
+                : "Reorder with ← → · Set main cover · Replace or remove"}
             </p>
           </div>
         </div>

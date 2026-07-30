@@ -18,8 +18,8 @@ export default function AboutPage() {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-jungle/70" />
-        <div className="relative mx-auto flex min-h-[42vh] max-w-6xl items-end px-4 pb-12 sm:px-6">
+        <div className="absolute inset-0 bg-gradient-to-t from-jungle/85 via-jungle/65 to-jungle/45" />
+        <div className="relative mx-auto flex min-h-[42vh] max-w-6xl items-end px-4 pb-12 pt-[var(--site-header-height)] sm:px-6">
           <h1 className="font-display text-4xl font-semibold text-foam sm:text-5xl">
             About Tripzo
           </h1>

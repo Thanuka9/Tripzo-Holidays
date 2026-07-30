@@ -14,6 +14,8 @@
   --whatsapp: #25d366;
   --background: var(--foam);
   --foreground: var(--ink);
+  /* Matches fixed public Header bar (logo + vertical padding) */
+  --site-header-height: 5rem;
 }
 
 @theme inline {
