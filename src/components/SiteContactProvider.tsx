@@ -10,6 +10,7 @@ const defaultContact: ContactSettings = {
   whatsapp: SITE.whatsapp,
   email: SITE.email,
   messenger: SITE.messenger,
+  siteUrl: SITE.url,
 };
 
 const ContactContext = createContext<ContactSettings>(defaultContact);

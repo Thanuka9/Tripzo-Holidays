@@ -4,7 +4,7 @@ import path from "path";
 import { randomUUID } from "crypto";
 import { isAdminAuthenticated } from "@/lib/auth";
 import {
-  addDestinationGalleryImage,
+  addDestinationGalleryImages,
   deleteDestination,
   getDestinations,
   updateDestinationGallery,
@@ -32,8 +32,16 @@ export async function POST(req: Request) {
   }
 
   const form = await req.formData();
-  const id = String(form.get("id") || randomUUID().slice(0, 8));
-  const name = String(form.get("name") || "");
+  const rawId = String(form.get("id") || "").trim();
+  const name = String(form.get("name") || "").trim();
+  const id =
+    rawId.replace(/[^a-zA-Z0-9-_]/g, "-").replace(/^-|-$/g, "") ||
+    name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "")
+      .slice(0, 72) ||
+    randomUUID().slice(0, 8);
   const region = String(form.get("region") || "");
   const description = String(form.get("description") || "");
   const featured =
@@ -41,7 +49,10 @@ export async function POST(req: Request) {
   const slideshow =
     form.get("slideshow") === "on" || form.get("slideshow") === "true";
   const existingImage = String(form.get("existingImage") || "");
-  const file = form.get("file");
+  const files = [
+    ...form.getAll("file"),
+    ...form.getAll("files"),
+  ].filter((f): f is File => f instanceof File && f.size > 0);
 
   if (!name || !description) {
     return NextResponse.json(
@@ -56,11 +67,14 @@ export async function POST(req: Request) {
   let image = existingImage || existing?.image || "";
   let gallery = existing?.gallery ? [...existing.gallery] : [];
 
-  if (file instanceof File && file.size > 0) {
+  if (files.length > 0) {
     try {
-      const src = await saveUpload(file, id);
-      image = src;
-      if (!gallery.includes(src)) gallery = [src, ...gallery];
+      const uploaded: string[] = [];
+      for (const file of files) {
+        uploaded.push(await saveUpload(file, id));
+      }
+      image = uploaded[0] || image;
+      gallery = [...uploaded, ...gallery.filter((src) => !uploaded.includes(src))];
     } catch (err) {
       const message = err instanceof Error ? err.message : "Upload failed";
       return NextResponse.json({ error: message }, { status: 500 });
@@ -169,22 +183,57 @@ export async function PATCH(req: Request) {
       }
     }
 
+    if (body.name || body.region || body.description || body.featured != null || body.slideshow != null) {
+      const list = await getDestinations();
+      const current = list.find((d) => d.id === id);
+      if (!current) {
+        return NextResponse.json({ error: "Not found" }, { status: 404 });
+      }
+      try {
+        const destination = await upsertDestination({
+          ...current,
+          name: body.name != null ? String(body.name) : current.name,
+          region: body.region != null ? String(body.region) : current.region,
+          description:
+            body.description != null
+              ? String(body.description)
+              : current.description,
+          featured:
+            body.featured != null ? Boolean(body.featured) : current.featured,
+          slideshow:
+            body.slideshow != null ? Boolean(body.slideshow) : current.slideshow,
+          image: current.image,
+          gallery: current.gallery,
+        });
+        return NextResponse.json({ destination });
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Update failed";
+        return NextResponse.json({ error: message }, { status: 500 });
+      }
+    }
+
     return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
   }
 
   const form = await req.formData();
   const id = String(form.get("id") || "");
-  const file = form.get("file");
-  if (!id || !(file instanceof File) || file.size === 0) {
+  const files = [
+    ...form.getAll("file"),
+    ...form.getAll("files"),
+  ].filter((f): f is File => f instanceof File && f.size > 0);
+  if (!id || files.length === 0) {
     return NextResponse.json(
-      { error: "Destination id and file required" },
+      { error: "Destination id and at least one photo required" },
       { status: 400 },
     );
   }
 
   try {
-    const src = await saveUpload(file, id);
-    const destination = await addDestinationGalleryImage(id, src);
+    const srcs: string[] = [];
+    for (const file of files) {
+      srcs.push(await saveUpload(file, id));
+    }
+    const destination = await addDestinationGalleryImages(id, srcs);
     if (!destination) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }

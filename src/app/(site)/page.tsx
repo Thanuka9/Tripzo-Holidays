@@ -9,7 +9,6 @@ import {
   Clock3,
 } from "lucide-react";
 import { whatsappLink } from "@/lib/constants";
-import { tours } from "@/lib/tours";
 import {
   getFleet,
   getDestinations,
@@ -17,6 +16,7 @@ import {
   getTeamPhotos,
   getHeroSlides,
   getContactSettings,
+  getTours,
 } from "@/lib/db";
 import { HeroSlideshow } from "@/components/HeroSlideshow";
 import { DestinationsGrid } from "@/components/DestinationsGrid";
@@ -51,8 +51,7 @@ const reasons = [
 ];
 
 export default async function HomePage() {
-  const featured = tours.filter((t) => t.featured).slice(0, 3);
-  const [fleet, destinations, reviews, teamPhotos, heroSlides, contact] =
+  const [fleet, destinations, reviews, teamPhotos, heroSlides, contact, allTours] =
     await Promise.all([
       getFleet(),
       getDestinations(),
@@ -60,7 +59,9 @@ export default async function HomePage() {
       getTeamPhotos(),
       getHeroSlides(),
       getContactSettings(),
+      getTours(),
     ]);
+  const featured = allTours.filter((t) => t.featured).slice(0, 3);
   const featuredPlaces = destinations.filter((d) => d.featured).slice(0, 6);
 
   return (

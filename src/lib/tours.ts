@@ -21,7 +21,7 @@ export type Tour = {
   pdfUrl?: string;
 };
 
-export const tours: Tour[] = [
+export const defaultTours: Tour[] = [
   {
     slug: "seven-days-sri-lanka",
     title: "Seven Days Sri Lanka Tour Package",
@@ -366,10 +366,12 @@ export const tours: Tour[] = [
   },
 ];
 
+export const tours = defaultTours;
+
 export function getTour(slug: string) {
-  return tours.find((t) => t.slug === slug);
+  return defaultTours.find((t) => t.slug === slug);
 }
 
 export function getFeaturedTours() {
-  return tours.filter((t) => t.featured).slice(0, 3);
+  return defaultTours.filter((t) => t.featured).slice(0, 3);
 }

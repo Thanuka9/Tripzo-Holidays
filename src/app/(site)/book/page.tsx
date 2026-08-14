@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { BookingForm } from "@/components/BookingForm";
 import { whatsappLink } from "@/lib/constants";
-import { getContactSettings } from "@/lib/db";
+import { getContactSettings, getTours } from "@/lib/db";
 
 export const metadata: Metadata = {
   title: "Book a Journey",
@@ -12,7 +12,10 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function BookPage() {
-  const contact = await getContactSettings();
+  const [contact, tours] = await Promise.all([
+    getContactSettings(),
+    getTours(),
+  ]);
 
   return (
     <div className="bg-island">
@@ -41,7 +44,7 @@ export default async function BookPage() {
           </a>
         </div>
         <Suspense fallback={<div className="h-[32rem] animate-pulse rounded-3xl bg-mist" />}>
-          <BookingForm />
+          <BookingForm tours={tours} />
         </Suspense>
       </div>
     </div>

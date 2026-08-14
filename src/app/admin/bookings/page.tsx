@@ -203,10 +203,10 @@ export default function AdminBookingsPage() {
 
         <aside className="space-y-4">
           <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-5">
-            <h2 className="font-display text-xl text-sun">Upcoming</h2>
+            <h2 className="font-display text-xl text-sun">Recent bookings</h2>
             <div className="mt-4 space-y-3">
               {upcoming.length === 0 && (
-                <p className="text-sm text-zinc-500">No upcoming trips yet.</p>
+                <p className="text-sm text-zinc-500">No bookings yet.</p>
               )}
               {upcoming.map((b) => (
                 <button

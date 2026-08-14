@@ -43,6 +43,7 @@ export async function POST(req: Request) {
   const caption = String(form.get("caption") || "");
   const place = String(form.get("place") || "");
   const people = String(form.get("people") || "");
+  const category = String(form.get("category") || "");
   const kindRaw = String(form.get("kind") || "general");
   const kind: GalleryKind =
     kindRaw === "team" ? "team" : kindRaw === "hero" ? "hero" : "general";
@@ -60,6 +61,7 @@ export async function POST(req: Request) {
       place: place || undefined,
       people: people || undefined,
       kind,
+      category: category || (kind === "general" ? "heritage" : undefined),
     });
     return NextResponse.json({ image });
   } catch (err) {
@@ -116,6 +118,7 @@ export async function PATCH(req: Request) {
         place: body.place != null ? String(body.place) : undefined,
         people: body.people != null ? String(body.people) : undefined,
         kind: body.kind,
+        category: body.category != null ? String(body.category) : undefined,
         featured: body.featured != null ? Boolean(body.featured) : undefined,
       });
       if (!image) {
@@ -139,6 +142,7 @@ export async function PATCH(req: Request) {
   if (form.has("caption")) patch.caption = String(form.get("caption") || "");
   if (form.has("place")) patch.place = String(form.get("place") || "");
   if (form.has("people")) patch.people = String(form.get("people") || "");
+  if (form.has("category")) patch.category = String(form.get("category") || "");
   if (form.has("kind")) {
     const kindRaw = String(form.get("kind") || "general");
     patch.kind =

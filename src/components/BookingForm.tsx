@@ -3,16 +3,17 @@
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { CheckCircle2, Loader2 } from "lucide-react";
-import { tours } from "@/lib/tours";
+import type { Tour } from "@/lib/tours";
 import { defaultFleet } from "@/lib/fleet";
 import { useWhatsAppLink } from "@/components/SiteContactProvider";
 
 type Props = {
   defaultTour?: string;
   compact?: boolean;
+  tours?: Pick<Tour, "slug" | "title" | "duration">[];
 };
 
-export function BookingForm({ defaultTour, compact }: Props) {
+export function BookingForm({ defaultTour, compact, tours = [] }: Props) {
   const params = useSearchParams();
   const wa = useWhatsAppLink();
   const initialTour = defaultTour || params.get("tour") || "";

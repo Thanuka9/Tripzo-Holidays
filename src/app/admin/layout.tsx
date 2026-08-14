@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { isAdminAuthenticated } from "@/lib/auth";
 import { AdminNav } from "@/components/admin/AdminNav";
+import { getContactSettings } from "@/lib/db";
+import { SITE } from "@/lib/constants";
 
 async function logoutAction() {
   "use server";
@@ -15,11 +17,13 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   const authed = await isAdminAuthenticated();
+  const contact = authed ? await getContactSettings() : null;
+  const siteUrl = contact?.siteUrl || SITE.url;
 
   return (
     <div className="flex min-h-screen flex-col bg-[#0f1412] text-zinc-100">
       {authed ? (
-        <AdminNav onLogout={logoutAction} />
+        <AdminNav onLogout={logoutAction} siteUrl={siteUrl} />
       ) : (
         <header className="shrink-0 border-b border-white/10">
           <div className="mx-auto flex max-w-7xl items-center px-4 py-4 sm:px-6">

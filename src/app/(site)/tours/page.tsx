@@ -1,15 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { tours } from "@/lib/tours";
+import { getTours } from "@/lib/db";
 
 export const metadata: Metadata = {
   title: "Tour Packages",
   description:
-    "Explore Tripzo Cabs & Tours packages  -  airport transfers, day trips, and multi-day Sri Lanka itineraries.",
+    "Explore Tripzo Cabs & Tours packages - airport transfers, day trips, and multi-day Sri Lanka itineraries.",
 };
 
-export default function ToursPage() {
+export const dynamic = "force-dynamic";
+
+export default async function ToursPage() {
+  const tours = await getTours();
   return (
     <div className="bg-island">
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">

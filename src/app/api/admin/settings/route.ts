@@ -22,6 +22,7 @@ export async function PUT(req: Request) {
       whatsapp: body.whatsapp,
       email: body.email,
       messenger: body.messenger,
+      siteUrl: body.siteUrl,
     });
     return NextResponse.json({ settings });
   } catch (err) {

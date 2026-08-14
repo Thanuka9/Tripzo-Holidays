@@ -11,6 +11,7 @@ import {
   MapPinned,
   Menu,
   MessageSquareHeart,
+  Route,
   Settings,
   X,
 } from "lucide-react";
@@ -20,6 +21,7 @@ import { cn } from "@/lib/utils";
 const links = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
   { href: "/admin/bookings", label: "Bookings", icon: CalendarDays },
+  { href: "/admin/tours", label: "Tours", icon: Route },
   { href: "/admin/reviews", label: "Reviews", icon: MessageSquareHeart },
   { href: "/admin/destinations", label: "Destinations", icon: MapPinned },
   { href: "/admin/gallery", label: "Images", icon: Camera },
@@ -29,8 +31,10 @@ const links = [
 
 export function AdminNav({
   onLogout,
+  siteUrl,
 }: {
   onLogout: () => Promise<void>;
+  siteUrl: string;
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -79,8 +83,9 @@ export function AdminNav({
 
         <div className="flex items-center gap-2">
           <Link
-            href="/"
+            href={siteUrl}
             target="_blank"
+            rel="noreferrer"
             className="hidden rounded-full border border-white/15 px-3 py-1.5 text-sm text-zinc-300 hover:bg-white/5 sm:inline-flex"
           >
             View site
@@ -131,8 +136,9 @@ export function AdminNav({
           </nav>
           <div className="mt-3 flex gap-2 border-t border-white/10 pt-3">
             <Link
-              href="/"
+              href={siteUrl}
               target="_blank"
+              rel="noreferrer"
               onClick={() => setOpen(false)}
               className="flex-1 rounded-full border border-white/15 px-3 py-2 text-center text-sm"
             >

@@ -192,8 +192,8 @@ export default function AdminGalleryPage() {
       <h1 className="font-display text-3xl text-sun">Images</h1>
       <p className="mt-2 max-w-2xl text-sm text-zinc-400">
         Same controls as fleet photos: reorder, set the main cover, replace,
-        add, or remove. Hero slides power the home slideshow; trip photos and
-        gallery uploads show on the public site.
+        add, or remove. Use Album / place so photos group together on the public
+        gallery (e.g. Sigiriya Lion Rock).
       </p>
 
       <div className="mt-6 flex flex-wrap gap-2">
@@ -255,7 +255,7 @@ export default function AdminGalleryPage() {
         </label>
         <label className="block">
           <span className="mb-1.5 block text-sm text-zinc-300">
-            {kind === "hero" ? "Caption" : "Place"}
+            {kind === "hero" ? "Caption" : "Album / place"}
           </span>
           <input
             name={kind === "hero" ? "caption" : "place"}
@@ -263,10 +263,26 @@ export default function AdminGalleryPage() {
             placeholder={
               kind === "hero"
                 ? "Cultural Triangle · Ancient Sri Lanka"
-                : "Sigiriya, Ella, Mirissa…"
+                : "Sigiriya Lion Rock, Temple of the Tooth…"
             }
           />
         </label>
+        {kind === "general" && (
+          <label className="block">
+            <span className="mb-1.5 block text-sm text-zinc-300">Category</span>
+            <select
+              name="category"
+              defaultValue="heritage"
+              className="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm outline-none"
+            >
+              <option value="heritage">Heritage</option>
+              <option value="hills">Hills & tea</option>
+              <option value="wildlife">Wildlife</option>
+              <option value="beach">Beach</option>
+              <option value="journey">On the road</option>
+            </select>
+          </label>
+        )}
         {kind === "team" && (
           <label className="block sm:col-span-2">
             <span className="mb-1.5 block text-sm text-zinc-300">
@@ -324,7 +340,7 @@ export default function AdminGalleryPage() {
             </h2>
             <p className="mt-1 text-xs text-zinc-500">
               {kind === "general"
-                ? "Curated island photos plus your uploads  -  reorder, set main, replace, remove"
+                ? "Curated island albums - replace, rename, add photos to a place, reorder, or remove"
                 : "Reorder with ← → · Set main cover · Replace or remove"}
             </p>
           </div>
@@ -458,12 +474,14 @@ function MetaEditor({
   const [caption, setCaption] = useState(img.caption || "");
   const [place, setPlace] = useState(img.place || "");
   const [people, setPeople] = useState(img.people || "");
+  const [category, setCategory] = useState(img.category || "heritage");
 
   useEffect(() => {
     setTitle(img.title);
     setCaption(img.caption || "");
     setPlace(img.place || "");
     setPeople(img.people || "");
+    setCategory(img.category || "heritage");
   }, [img]);
 
   return (
@@ -478,8 +496,20 @@ function MetaEditor({
         value={place}
         onChange={(e) => setPlace(e.target.value)}
         className="w-full rounded-lg border border-white/10 bg-black/20 px-2 py-1.5 text-xs outline-none"
-        placeholder="Place"
+        placeholder="Album / place"
       />
+      <select
+        value={category}
+        onChange={(e) => setCategory(e.target.value)}
+        className="w-full rounded-lg border border-white/10 bg-black/20 px-2 py-1.5 text-xs outline-none"
+      >
+        <option value="heritage">Heritage</option>
+        <option value="hills">Hills & tea</option>
+        <option value="wildlife">Wildlife</option>
+        <option value="beach">Beach</option>
+        <option value="journey">On the road</option>
+        <option value="trips">Our trips</option>
+      </select>
       <input
         value={people}
         onChange={(e) => setPeople(e.target.value)}
@@ -501,6 +531,7 @@ function MetaEditor({
               caption: caption || undefined,
               place: place || undefined,
               people: people || undefined,
+              category,
             })
           }
           className="inline-flex flex-1 items-center justify-center gap-1 rounded-full bg-sun px-2 py-1.5 text-[11px] font-semibold text-jungle"

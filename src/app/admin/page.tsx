@@ -6,6 +6,7 @@ import {
   getGallery,
   getDestinations,
   getReviews,
+  getTours,
 } from "@/lib/db";
 import AdminDashboardClient from "@/components/admin/AdminDashboardClient";
 
@@ -14,12 +15,13 @@ export const dynamic = "force-dynamic";
 export default async function AdminHomePage() {
   if (!(await isAdminAuthenticated())) redirect("/admin/login");
 
-  const [bookings, gallery, fleet, destinations, reviews] = await Promise.all([
+  const [bookings, gallery, fleet, destinations, reviews, tours] = await Promise.all([
     getBookings(),
     getGallery(),
     getFleet(),
     getDestinations(),
     getReviews(),
+    getTours(),
   ]);
 
   return (
@@ -33,6 +35,7 @@ export default async function AdminHomePage() {
         fleet: fleet.length,
         reviews: reviews.length,
         pendingReviews: reviews.filter((r) => r.status === "pending").length,
+        tours: tours.length,
       }}
     />
   );

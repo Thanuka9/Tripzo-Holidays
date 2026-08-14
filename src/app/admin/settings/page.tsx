@@ -11,6 +11,7 @@ const empty: ContactSettings = {
   whatsapp: "",
   email: "",
   messenger: "",
+  siteUrl: "",
 };
 
 export default function AdminSettingsPage() {
@@ -64,14 +65,20 @@ export default function AdminSettingsPage() {
     <div>
       <h1 className="font-display text-3xl text-sun">Site settings</h1>
       <p className="mt-2 max-w-2xl text-sm text-zinc-400">
-        Update the phone, WhatsApp, email, and Messenger links shown across the
-        website (header, footer, contact, WhatsApp button).
+        Update the public website URL, phone, WhatsApp, email, and Messenger
+        links shown across the site.
       </p>
 
       <form
         onSubmit={onSave}
         className="mt-8 max-w-xl space-y-4 rounded-3xl border border-white/10 bg-white/5 p-6"
       >
+        <Field
+          label="Public website URL"
+          hint="Used by Admin → View site. Example: https://tripzo-holidays-thanuka9s-projects.vercel.app"
+          value={settings.siteUrl}
+          onChange={(siteUrl) => setSettings((s) => ({ ...s, siteUrl }))}
+        />
         <Field
           label="Phone (tel link)"
           hint="Include country code, e.g. +94766493348"

@@ -2,7 +2,9 @@ import { promises as fs } from "fs";
 import path from "path";
 import { randomUUID } from "crypto";
 import { defaultFleet, type Vehicle } from "./fleet";
-import { defaultDestinations, type Destination, DESTINATION_IMAGE_VERSION } from "./destinations";
+import { defaultDestinations, type Destination } from "./destinations";
+import { defaultTours, type Tour } from "./tours";
+import { SITE } from "./constants";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 
@@ -48,6 +50,7 @@ export type ContactSettings = {
   whatsapp: string;
   email: string;
   messenger: string;
+  siteUrl: string;
 };
 
 export type ReviewStatus = "pending" | "approved" | "hidden";
@@ -69,6 +72,11 @@ export type FleetRecord = Vehicle & {
 };
 
 export type DestinationRecord = Destination & {
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type TourRecord = Tour & {
   createdAt: string;
   updatedAt: string;
 };
@@ -114,89 +122,7 @@ async function writeJson<T>(file: string, data: T) {
 }
 
 export async function getBookings() {
-  const seeded = demoBookings();
-  return readJson<Booking[]>("bookings.json", seeded);
-}
-
-function demoBookings(): Booking[] {
-  const now = new Date();
-  const y = now.getFullYear();
-  const m = String(now.getMonth() + 1).padStart(2, "0");
-  const d = (n: number) =>
-    `${y}-${m}-${String(Math.min(28, Math.max(1, n))).padStart(2, "0")}`;
-
-  return [
-    {
-      id: "demo-1",
-      createdAt: new Date().toISOString(),
-      name: "Sarah Mitchell",
-      email: "sarah@example.com",
-      phone: "+94770000001",
-      tourSlug: "seven-days-sri-lanka",
-      tourTitle: "Seven Days Sri Lanka Tour",
-      vehicleId: "kdh",
-      startDate: d(now.getDate() + 3),
-      travelers: 2,
-      pickup: "CMB Airport",
-      message: "Looking forward to the scenic train day!",
-      status: "new",
-    },
-    {
-      id: "demo-2",
-      createdAt: new Date().toISOString(),
-      name: "Arun Perera",
-      email: "arun@example.com",
-      phone: "+94770000002",
-      tourSlug: "airport-transfer",
-      tourTitle: "Airport Pickup & Drop",
-      vehicleId: "prius",
-      startDate: d(now.getDate() + 1),
-      travelers: 3,
-      pickup: "Negombo hotel",
-      message: "Evening flight arrival.",
-      status: "confirmed",
-    },
-    {
-      id: "demo-3",
-      createdAt: new Date().toISOString(),
-      name: "Emily Chen",
-      email: "emily@example.com",
-      phone: "+94770000003",
-      tourSlug: "sigiriya-day-tour",
-      tourTitle: "Sigiriya & Cultural Triangle",
-      vehicleId: "kdh",
-      startDate: d(now.getDate() + 8),
-      travelers: 4,
-      pickup: "Kandy",
-      status: "confirmed",
-    },
-    {
-      id: "demo-4",
-      createdAt: new Date().toISOString(),
-      name: "James Walker",
-      email: "james@example.com",
-      phone: "+94770000004",
-      tourSlug: "kandy-city-tour",
-      tourTitle: "Kandy City Tour",
-      startDate: d(now.getDate() + 12),
-      travelers: 2,
-      pickup: "Kandy city hotel",
-      status: "new",
-    },
-    {
-      id: "demo-5",
-      createdAt: new Date().toISOString(),
-      name: "Nimal Fernando",
-      email: "nimal@example.com",
-      phone: "+94770000005",
-      tourTitle: "Custom south coast",
-      vehicleId: "coaster",
-      startDate: d(now.getDate() - 2),
-      travelers: 18,
-      pickup: "Colombo",
-      status: "completed",
-    },
-  ];
+  return readJson<Booking[]>("bookings.json", []);
 }
 
 export async function createBooking(
@@ -328,33 +254,7 @@ export async function ensureDefaultHeroSlides() {
   const { slideshowSlides } = await import("./destinations");
   const gallery = await getGallery();
   const heroes = gallery.filter((g) => g.kind === "hero");
-
-  // Keep seeded heroes in sync with current landmark slides
   if (heroes.length > 0) {
-    let changed = false;
-    const byId = new Map(gallery.map((g) => [g.id, g]));
-    slideshowSlides.forEach((s, i) => {
-      const id = `hero-seed-${i + 1}`;
-      const existing = byId.get(id);
-      if (existing && (existing.src !== s.src || existing.title !== s.title)) {
-        byId.set(id, {
-          ...existing,
-          src: s.src,
-          title: s.title,
-          caption: s.caption,
-        });
-        changed = true;
-      }
-    });
-    if (changed) {
-      const next = Array.from(byId.values());
-      try {
-        await writeJson("gallery.json", next);
-      } catch {
-        return sortGallery(next);
-      }
-      return sortGallery(next);
-    }
     return gallery;
   }
 
@@ -376,13 +276,18 @@ export async function ensureDefaultHeroSlides() {
   return sortGallery(next);
 }
 
-/** Seed curated Sri Lanka showcase photos so they appear in admin Images */
+/** Seed curated Sri Lanka showcase photos once. Never overwrite admin edits. */
 export async function ensureShowcaseGallery() {
   const { showcaseGallery, showcaseAlbums } = await import("./gallery");
-  let gallery = await getGallery();
+  const gallery = await getGallery();
   const byId = new Map(gallery.map((g) => [g.id, g]));
-  let changed = false;
+  const meta = await readJson<{ seeded?: boolean }>("gallery-meta.json", {});
 
+  if (meta.seeded && gallery.length > 0) {
+    return gallery;
+  }
+
+  let changed = false;
   const albumTitleById = new Map(
     showcaseAlbums.flatMap((album) =>
       album.photos.map((photo) => [photo.id, album.title] as const),
@@ -390,44 +295,36 @@ export async function ensureShowcaseGallery() {
   );
 
   for (const [i, s] of showcaseGallery.entries()) {
-    const existing = byId.get(s.id);
+    if (byId.has(s.id)) continue;
     const albumTitle = albumTitleById.get(s.id) || s.title;
-    if (!existing) {
-      byId.set(s.id, {
-        id: s.id,
-        src: s.src,
-        title: s.title,
-        kind: "general",
-        category: s.category,
-        place: albumTitle,
-        caption: s.category,
-        sortOrder: i,
-        featured: i === 0,
-        createdAt: new Date().toISOString(),
-      });
-      changed = true;
-      continue;
-    }
-    if (
-      existing.src !== s.src ||
-      existing.title !== s.title ||
-      existing.place !== albumTitle
-    ) {
-      byId.set(s.id, {
-        ...existing,
-        src: s.src,
-        title: s.title,
-        category: s.category,
-        place: albumTitle,
-      });
-      changed = true;
-    }
+    byId.set(s.id, {
+      id: s.id,
+      src: s.src,
+      title: s.title,
+      kind: "general",
+      category: s.category,
+      place: albumTitle,
+      caption: s.category,
+      sortOrder: i,
+      featured: i === 0,
+      createdAt: new Date().toISOString(),
+    });
+    changed = true;
   }
 
-  if (!changed) return gallery;
+  if (!changed) {
+    try {
+      await writeJson("gallery-meta.json", { seeded: true });
+    } catch {
+      /* read-only host */
+    }
+    return gallery;
+  }
+
   const next = Array.from(byId.values());
   try {
     await writeJson("gallery.json", next);
+    await writeJson("gallery-meta.json", { seeded: true });
   } catch {
     return sortGallery(next);
   }
@@ -472,6 +369,7 @@ const defaultContact = (): ContactSettings => ({
   email: process.env.NEXT_PUBLIC_EMAIL || "chathurasamarakoon9@gmail.com",
   messenger:
     process.env.NEXT_PUBLIC_MESSENGER || "https://m.me/TripzoHolidays",
+  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || SITE.url,
 });
 
 export async function getContactSettings(): Promise<ContactSettings> {
@@ -492,6 +390,10 @@ export async function updateContactSettings(
     whatsapp: (patch.whatsapp?.trim() || current.whatsapp).replace(/\D/g, ""),
     email: patch.email?.trim() || current.email,
     messenger: patch.messenger?.trim() || current.messenger,
+    siteUrl: (patch.siteUrl?.trim() || current.siteUrl || SITE.url).replace(
+      /\/$/,
+      "",
+    ),
   };
   await writeJson("settings.json", next);
   return next;
@@ -608,88 +510,51 @@ const LEGACY_BAD_DEST_IMAGES = new Set([
   "/images/gallery/horton.jpg", // not Nuwara Eliya town/estates
 ]);
 
-function hasLegacyBadImages(paths: string[] | undefined) {
-  return (paths || []).some((src) => LEGACY_BAD_DEST_IMAGES.has(src));
-}
-
-export async function getDestinations(): Promise<DestinationRecord[]> {
-  const seeded: DestinationRecord[] = defaultDestinations.map((d) => ({
+function seededDestinations(): DestinationRecord[] {
+  return defaultDestinations.map((d) => ({
     ...d,
     gallery: d.gallery?.length ? d.gallery : [d.image],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   }));
-  let stored = await readJson<DestinationRecord[]>(
+}
+
+async function loadStoredDestinations(): Promise<DestinationRecord[]> {
+  const stored = await readJson<DestinationRecord[]>(
     "destinations.json",
-    seeded,
+    seededDestinations(),
   );
-  const defaults = new Map(defaultDestinations.map((d) => [d.id, d]));
+  const known = new Set(stored.map((d) => d.id));
+  const extra = seededDestinations().filter((d) => !known.has(d.id));
+  return extra.length ? [...stored, ...extra] : stored;
+}
 
-  const meta = await readJson<{ version: number }>("destinations-meta.json", {
-    version: 0,
-  });
-  if (meta.version < DESTINATION_IMAGE_VERSION) {
-    stored = stored.map((d) => {
-      const def = defaults.get(d.id);
-      if (!def?.gallery?.length) return d;
-      return {
-        ...d,
-        image: def.image,
-        gallery: def.gallery,
-        updatedAt: new Date().toISOString(),
-      };
-    });
-    try {
-      await writeJson("destinations.json", stored);
-      await writeJson("destinations-meta.json", {
-        version: DESTINATION_IMAGE_VERSION,
-      });
-    } catch {
-      /* read-only host */
-    }
-  }
-
-  return stored.map((d) => {
+function sanitizeDestination(d: DestinationRecord): DestinationRecord {
+  const defaults = new Map(defaultDestinations.map((x) => [x.id, x]));
+  const gallery = (d.gallery?.length ? d.gallery : d.image ? [d.image] : []).filter(
+    (src) => src && !LEGACY_BAD_DEST_IMAGES.has(src),
+  );
+  if (gallery.length === 0) {
     const def = defaults.get(d.id);
-    const gallery = (d.gallery || []).filter(
-      (src) => !LEGACY_BAD_DEST_IMAGES.has(src),
-    );
-
-    if (def?.gallery?.length && (hasLegacyBadImages(d.gallery) || gallery.length < 2)) {
-      return {
-        ...d,
-        image: def.image,
-        gallery: def.gallery,
-      };
-    }
-
-    if (gallery.length > 0) {
-      return {
-        ...d,
-        gallery,
-        image: LEGACY_BAD_DEST_IMAGES.has(d.image)
-          ? gallery[0]
-          : d.image || gallery[0],
-      };
-    }
-
     if (def?.gallery?.length) {
-      return {
-        ...d,
-        image: def.image,
-        gallery: def.gallery,
-      };
+      return { ...d, image: def.image, gallery: def.gallery };
     }
+    return { ...d, gallery: [] };
+  }
+  const image =
+    d.image && gallery.includes(d.image) && !LEGACY_BAD_DEST_IMAGES.has(d.image)
+      ? d.image
+      : gallery[0];
+  return { ...d, gallery, image };
+}
 
-    return {
-      ...d,
-      gallery: d.image && !LEGACY_BAD_DEST_IMAGES.has(d.image) ? [d.image] : [],
-    };
-  });
+export async function getDestinations(): Promise<DestinationRecord[]> {
+  const stored = await loadStoredDestinations();
+  return stored.map(sanitizeDestination);
 }
 
 export async function upsertDestination(destination: Destination) {
-  const list: DestinationRecord[] = await getDestinations();
+  const list = await loadStoredDestinations();
   const idx = list.findIndex((d) => d.id === destination.id);
   const existing = idx >= 0 ? list[idx] : null;
   const gallery =
@@ -706,7 +571,7 @@ export async function upsertDestination(destination: Destination) {
   if (idx >= 0) list[idx] = record;
   else list.push(record);
   await writeJson("destinations.json", list);
-  return record;
+  return sanitizeDestination(record);
 }
 
 export async function updateDestinationGallery(
@@ -714,7 +579,7 @@ export async function updateDestinationGallery(
   gallery: string[],
   mainImage?: string,
 ) {
-  const list = await getDestinations();
+  const list = await loadStoredDestinations();
   const idx = list.findIndex((d) => d.id === id);
   if (idx === -1) return null;
   const nextGallery = gallery.filter(Boolean);
@@ -731,14 +596,16 @@ export async function updateDestinationGallery(
     updatedAt: new Date().toISOString(),
   };
   await writeJson("destinations.json", list);
-  return list[idx];
+  return sanitizeDestination(list[idx]);
 }
 
 export async function addDestinationGalleryImage(id: string, src: string) {
-  const list = await getDestinations();
+  const list = await loadStoredDestinations();
   const idx = list.findIndex((d) => d.id === id);
   if (idx === -1) return null;
-  const gallery = [...(list[idx].gallery || [list[idx].image]), src];
+  const gallery = [...(list[idx].gallery || [list[idx].image]), src].filter(
+    Boolean,
+  );
   list[idx] = {
     ...list[idx],
     gallery,
@@ -746,13 +613,73 @@ export async function addDestinationGalleryImage(id: string, src: string) {
     updatedAt: new Date().toISOString(),
   };
   await writeJson("destinations.json", list);
-  return list[idx];
+  return sanitizeDestination(list[idx]);
+}
+
+export async function addDestinationGalleryImages(id: string, srcs: string[]) {
+  const list = await loadStoredDestinations();
+  const idx = list.findIndex((d) => d.id === id);
+  if (idx === -1) return null;
+  const gallery = [
+    ...(list[idx].gallery || [list[idx].image]),
+    ...srcs,
+  ].filter(Boolean);
+  list[idx] = {
+    ...list[idx],
+    gallery,
+    image: list[idx].image || srcs[0] || "",
+    updatedAt: new Date().toISOString(),
+  };
+  await writeJson("destinations.json", list);
+  return sanitizeDestination(list[idx]);
 }
 
 export async function deleteDestination(id: string) {
-  const list = await getDestinations();
+  const list = await loadStoredDestinations();
   const next = list.filter((d) => d.id !== id);
   await writeJson("destinations.json", next);
+  return next.map(sanitizeDestination);
+}
+
+function seededTours(): TourRecord[] {
+  return defaultTours.map((t) => ({
+    ...t,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  }));
+}
+
+export async function getTours(): Promise<TourRecord[]> {
+  const stored = await readJson<TourRecord[]>("tours.json", seededTours());
+  const known = new Set(stored.map((t) => t.slug));
+  const extra = seededTours().filter((t) => !known.has(t.slug));
+  return extra.length ? [...stored, ...extra] : stored;
+}
+
+export async function getTourBySlug(slug: string) {
+  const list = await getTours();
+  return list.find((t) => t.slug === slug) || null;
+}
+
+export async function upsertTour(tour: Tour) {
+  const list = await getTours();
+  const idx = list.findIndex((t) => t.slug === tour.slug);
+  const existing = idx >= 0 ? list[idx] : null;
+  const record: TourRecord = {
+    ...tour,
+    createdAt: existing?.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+  if (idx >= 0) list[idx] = record;
+  else list.push(record);
+  await writeJson("tours.json", list);
+  return record;
+}
+
+export async function deleteTour(slug: string) {
+  const list = await getTours();
+  const next = list.filter((t) => t.slug !== slug);
+  await writeJson("tours.json", next);
   return next;
 }
 

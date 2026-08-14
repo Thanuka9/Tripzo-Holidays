@@ -5,6 +5,9 @@ export const SITE = {
   tagline: "Reliable transport for locals and tourists across Sri Lanka.",
   description:
     "From daily rides to dream tours, we make every journey smooth, safe, and unforgettable.",
+  url:
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    "https://tripzo-holidays-thanuka9s-projects.vercel.app",
   phone: process.env.NEXT_PUBLIC_PHONE || "+94766493348",
   phoneDisplay: "076 649 3348",
   whatsapp: process.env.NEXT_PUBLIC_WHATSAPP || "94766493348",

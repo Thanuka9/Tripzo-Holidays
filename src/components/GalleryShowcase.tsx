@@ -103,25 +103,8 @@ export function GalleryShowcase({ uploads = [] }: Props) {
       galleryCategories.map((c) => c.id).filter((id) => id !== "all"),
     );
 
-    const staticAlbums: AlbumView[] = showcaseAlbums.map((album) => ({
-      ...album,
-      photos: [...album.photos],
-      focus: focusFor(album.cover || album.photos[0]?.src || ""),
-    }));
-
     const teamUploads = uploads.filter((u) => u.kind === "team");
-    const showcaseIds = new Set(
-      showcaseAlbums.flatMap((a) => a.photos.map((p) => p.id)),
-    );
-    const showcaseSrcs = new Set(
-      showcaseAlbums.flatMap((a) => a.photos.map((p) => p.src)),
-    );
-    const otherUploads = uploads.filter(
-      (u) =>
-        u.kind !== "team" &&
-        !showcaseIds.has(u.id) &&
-        !showcaseSrcs.has(u.src),
-    );
+    const generalUploads = uploads.filter((u) => u.kind !== "team");
 
     const tripGroups = new Map<string, AlbumView>();
     for (const u of teamUploads) {
@@ -148,25 +131,20 @@ export function GalleryShowcase({ uploads = [] }: Props) {
       }
     }
 
-    const curated: AlbumView[] = staticAlbums.filter(
-      (album) => album.photos.length > 0,
-    );
-
-    // General uploads: group by place title when available, else single album
-    const generalGroups = new Map<string, AlbumView>();
-    for (const u of otherUploads) {
+    const placeGroups = new Map<string, AlbumView>();
+    for (const u of generalUploads) {
       const place = (u.place || u.title || "More photos").trim();
-      const key = `upload-${slugifyPlace(place) || u.id}`;
+      const key = `album-${slugifyPlace(place) || u.id}`;
       const fromMeta =
         (u.category && categoryIds.has(u.category as GalleryCategory)
           ? (u.category as GalleryCategory)
           : null) || ("journey" as GalleryCategory);
       const photo: ShowcasePhoto = { id: u.id, src: u.src, title: u.title };
-      const existing = generalGroups.get(key);
+      const existing = placeGroups.get(key);
       if (existing) {
         existing.photos.push(photo);
       } else {
-        generalGroups.set(key, {
+        placeGroups.set(key, {
           id: key,
           title: place,
           category: fromMeta,
@@ -177,11 +155,19 @@ export function GalleryShowcase({ uploads = [] }: Props) {
       }
     }
 
-    const merged = [
+    const fromUploads = [
       ...Array.from(tripGroups.values()),
-      ...Array.from(generalGroups.values()),
-      ...curated,
+      ...Array.from(placeGroups.values()),
     ];
+
+    const merged =
+      fromUploads.length > 0
+        ? fromUploads
+        : showcaseAlbums.map((album) => ({
+            ...album,
+            photos: [...album.photos],
+            focus: focusFor(album.cover || album.photos[0]?.src || ""),
+          }));
 
     if (filter === "all") return merged;
     return merged.filter((a) => a.category === filter);

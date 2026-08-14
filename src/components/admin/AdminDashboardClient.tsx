@@ -10,6 +10,7 @@ import {
   MapPinned,
   ArrowRight,
   MessageSquareHeart,
+  Route,
 } from "lucide-react";
 import type { Booking } from "@/lib/db";
 import { BookingCalendar } from "@/components/admin/BookingCalendar";
@@ -22,6 +23,7 @@ type Stats = {
   fleet: number;
   reviews: number;
   pendingReviews: number;
+  tours: number;
 };
 
 export default function AdminDashboardClient({
@@ -75,6 +77,13 @@ export default function AdminDashboardClient({
       icon: Camera,
     },
     {
+      label: "Tours",
+      value: stats.tours,
+      hint: "Packages & transfers",
+      href: "/admin/tours",
+      icon: Route,
+    },
+    {
       label: "Destinations",
       value: stats.destinations,
       hint: "Places & photos",
@@ -96,8 +105,8 @@ export default function AdminDashboardClient({
         <div>
           <h1 className="font-display text-3xl text-sun">Operations dashboard</h1>
           <p className="mt-2 max-w-2xl text-sm text-zinc-400">
-            Calendar view of trips, booking details, and quick links to manage photos, places,
-            and vehicles.
+            Calendar of real bookings, plus quick links to packages, photos, and
+            vehicles.
           </p>
         </div>
         <Link
@@ -108,7 +117,7 @@ export default function AdminDashboardClient({
         </Link>
       </div>
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {cards.map((card) => (
           <Link
             key={card.href}
@@ -139,14 +148,14 @@ export default function AdminDashboardClient({
         <div className="space-y-4">
           <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-5">
             <h2 className="font-display text-xl text-sun">
-              {selectedDate ? `Trips on ${selectedDate}` : "Upcoming trips"}
+              {selectedDate ? `Bookings on ${selectedDate}` : "Bookings"}
             </h2>
             <div className="mt-4 space-y-3">
               {(selectedDate ? dayBookings : upcoming).length === 0 && (
                 <p className="text-sm text-zinc-500">
                   {selectedDate
                     ? "No bookings on this day."
-                    : "No upcoming bookings yet  -  new requests will appear here."}
+                    : "No bookings yet. New requests from the website will show here."}
                 </p>
               )}
               {(selectedDate ? dayBookings : upcoming).map((b) => (
@@ -173,6 +182,11 @@ export default function AdminDashboardClient({
 
           <div className="grid gap-3">
             {[
+              {
+                title: "Tours & transfers",
+                text: "Add or edit packages shown on the website",
+                href: "/admin/tours",
+              },
               {
                 title: "Approve guest reviews",
                 text: "Publish feedback on the website",

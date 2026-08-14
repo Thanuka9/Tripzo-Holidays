@@ -43,17 +43,23 @@ export default function AdminDestinationsPage() {
     const body = new FormData(form);
     const res = await fetch("/api/destinations", { method: "POST", body });
     setPending(false);
+    const text = await res.text();
+    let data: { error?: string } = {};
+    try {
+      data = JSON.parse(text);
+    } catch {
+      /* ignore */
+    }
     if (res.status === 401) {
       router.push("/admin/login");
       return;
     }
     if (!res.ok) {
-      const data = await res.json();
       setMessage(data.error || "Save failed");
       return;
     }
     form.reset();
-    setMessage("Destination saved  -  it will appear on the website.");
+    setMessage("Destination saved. It will appear on the website.");
     await load();
   }
 
@@ -132,34 +138,65 @@ export default function AdminDestinationsPage() {
     }
   }
 
-  async function addPhoto(id: string, file: File) {
+  async function saveDetails(place: DestinationRecord, form: HTMLFormElement) {
+    const data = new FormData(form);
+    const updated = await patchDestination({
+      id: place.id,
+      name: String(data.get("name") || place.name),
+      region: String(data.get("region") || place.region),
+      description: String(data.get("description") || place.description),
+      featured: data.get("featured") === "on",
+      slideshow: data.get("slideshow") === "on",
+    });
+    if (updated) {
+      setDestinations((list) =>
+        list.map((d) => (d.id === updated.id ? updated : d)),
+      );
+      setMessage("Place details updated");
+    }
+  }
+
+  async function addPhotos(id: string, files: FileList | File[]) {
+    const list = Array.from(files).filter((f) => f.size > 0);
+    if (list.length === 0) return;
     setPending(true);
     const body = new FormData();
     body.set("id", id);
-    body.set("file", file);
+    for (const file of list) body.append("files", file);
     const res = await fetch("/api/destinations", { method: "PATCH", body });
     setPending(false);
     if (res.status === 401) {
       router.push("/admin/login");
       return;
     }
-    const data = await res.json();
+    const text = await res.text();
+    let data: { error?: string; destination?: DestinationRecord } = {};
+    try {
+      data = JSON.parse(text);
+    } catch {
+      /* ignore */
+    }
     if (!res.ok) {
       setMessage(data.error || "Upload failed");
       return;
     }
-    setDestinations((list) =>
-      list.map((d) => (d.id === data.destination.id ? data.destination : d)),
+    if (data.destination) {
+      setDestinations((items) =>
+        items.map((d) => (d.id === data.destination!.id ? data.destination! : d)),
+      );
+    }
+    setMessage(
+      list.length > 1 ? `${list.length} photos added` : "Photo added",
     );
-    setMessage("Photo added");
   }
 
   return (
     <div>
       <h1 className="font-display text-3xl text-sun">Destinations</h1>
       <p className="mt-2 max-w-2xl text-sm text-zinc-400">
-        Each place can have 4–5 photos in a slideshow. Set the main cover,
-        reorder, add, or remove images  -  same as fleet.
+        Each place can have several photos in a slideshow. Add a new place below,
+        or open a card to edit details, upload multiple images, set the cover,
+        reorder, or remove photos.
       </p>
 
       <form
@@ -188,11 +225,14 @@ export default function AdminDestinationsPage() {
           Include in hero slideshow pool
         </label>
         <label className="block sm:col-span-2">
-          <span className="mb-1.5 block text-sm text-zinc-300">Cover photo</span>
+          <span className="mb-1.5 block text-sm text-zinc-300">
+            Photos (you can select several)
+          </span>
           <input
             type="file"
-            name="file"
+            name="files"
             accept="image/*"
+            multiple
             className="w-full text-sm file:mr-3 file:rounded-full file:border-0 file:bg-sun file:px-4 file:py-2 file:text-sm file:font-semibold file:text-jungle"
           />
         </label>
@@ -253,7 +293,7 @@ export default function AdminDestinationsPage() {
                       onClick={() => setExpanded(open ? null : d.id)}
                       className="rounded-full border border-sun/40 bg-sun/10 px-3 py-1.5 text-xs text-sun"
                     >
-                      {open ? "Hide photos" : "Edit photos"}
+                      {open ? "Hide editor" : "Edit place"}
                     </button>
                   </div>
                 </div>
@@ -269,20 +309,80 @@ export default function AdminDestinationsPage() {
 
               {open && (
                 <div className="border-t border-white/10 bg-black/20 p-4">
+                  <form
+                    className="mb-5 grid gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 sm:grid-cols-2"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      saveDetails(d, e.currentTarget);
+                    }}
+                  >
+                    <label className="block">
+                      <span className="mb-1 block text-xs text-zinc-400">Name</span>
+                      <input
+                        name="name"
+                        defaultValue={d.name}
+                        className="w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm outline-none"
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="mb-1 block text-xs text-zinc-400">Region</span>
+                      <input
+                        name="region"
+                        defaultValue={d.region}
+                        className="w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm outline-none"
+                      />
+                    </label>
+                    <label className="block sm:col-span-2">
+                      <span className="mb-1 block text-xs text-zinc-400">
+                        Description
+                      </span>
+                      <textarea
+                        name="description"
+                        rows={3}
+                        defaultValue={d.description}
+                        className="w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm outline-none"
+                      />
+                    </label>
+                    <label className="flex items-center gap-2 text-sm text-zinc-300">
+                      <input
+                        type="checkbox"
+                        name="featured"
+                        defaultChecked={d.featured}
+                        className="rounded"
+                      />
+                      Show on home page
+                    </label>
+                    <label className="flex items-center gap-2 text-sm text-zinc-300">
+                      <input
+                        type="checkbox"
+                        name="slideshow"
+                        defaultChecked={d.slideshow}
+                        className="rounded"
+                      />
+                      Hero slideshow pool
+                    </label>
+                    <button
+                      type="submit"
+                      className="rounded-full bg-sun px-4 py-2 text-xs font-bold text-jungle sm:col-span-2"
+                    >
+                      Save place details
+                    </button>
+                  </form>
                   <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
                     <p className="text-sm text-zinc-300">
-                      Reorder, set main cover, add or remove (aim for 4–5 photos).
+                      Upload several photos, set the main cover, reorder, or remove.
                     </p>
                     <label className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-sun px-3 py-1.5 text-xs font-semibold text-jungle">
                       <Upload className="h-3.5 w-3.5" />
-                      Add photo
+                      Add photos
                       <input
                         type="file"
                         accept="image/*"
+                        multiple
                         className="hidden"
                         onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) addPhoto(d.id, file);
+                          const files = e.target.files;
+                          if (files?.length) addPhotos(d.id, files);
                           e.target.value = "";
                         }}
                       />

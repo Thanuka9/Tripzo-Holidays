@@ -3,26 +3,30 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { getTour, tours } from "@/lib/tours";
+import { getTourBySlug, getTours } from "@/lib/db";
 import { BookingForm } from "@/components/BookingForm";
 import { whatsappLink } from "@/lib/constants";
 
 type Props = { params: Promise<{ slug: string }> };
 
+export const dynamic = "force-dynamic";
+export const dynamicParams = true;
+
 export async function generateStaticParams() {
+  const tours = await getTours();
   return tours.map((t) => ({ slug: t.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const tour = getTour(slug);
+  const tour = await getTourBySlug(slug);
   if (!tour) return { title: "Tour" };
   return { title: tour.title, description: tour.summary };
 }
 
 export default async function TourDetailPage({ params }: Props) {
   const { slug } = await params;
-  const tour = getTour(slug);
+  const [tour, tours] = await Promise.all([getTourBySlug(slug), getTours()]);
   if (!tour) notFound();
 
   return (
@@ -132,7 +136,7 @@ export default async function TourDetailPage({ params }: Props) {
 
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <Suspense fallback={<div className="h-96 animate-pulse rounded-3xl bg-mist" />}>
-            <BookingForm defaultTour={tour.slug} compact />
+            <BookingForm defaultTour={tour.slug} compact tours={tours} />
           </Suspense>
           <a
             href={whatsappLink(

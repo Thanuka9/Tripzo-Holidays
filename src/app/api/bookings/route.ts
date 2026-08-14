@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createBooking } from "@/lib/db";
-import { getTour } from "@/lib/tours";
+import { getTourBySlug } from "@/lib/db";
 
 const schema = z.object({
   name: z.string().min(2),
@@ -26,7 +26,9 @@ export async function POST(req: Request) {
       );
     }
 
-    const tour = parsed.data.tourSlug ? getTour(parsed.data.tourSlug) : undefined;
+    const tour = parsed.data.tourSlug
+      ? await getTourBySlug(parsed.data.tourSlug)
+      : undefined;
     const booking = await createBooking({
       ...parsed.data,
       tourTitle: tour?.title,
