@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import Image from "next/image";
+import { SiteImage as Image } from "@/components/SiteImage";
 import { useRouter } from "next/navigation";
 import {
   Loader2,
@@ -229,11 +229,14 @@ export default function AdminGalleryPage() {
         className="mt-6 grid gap-4 rounded-3xl border border-white/10 bg-white/5 p-5 sm:grid-cols-2"
       >
         <label className="block sm:col-span-2">
-          <span className="mb-1.5 block text-sm text-zinc-300">Photo file</span>
+          <span className="mb-1.5 block text-sm text-zinc-300">
+            Photo files (you can select several)
+          </span>
           <input
             type="file"
-            name="file"
+            name="files"
             accept="image/*"
+            multiple
             required
             className="w-full text-sm file:mr-3 file:rounded-full file:border-0 file:bg-sun file:px-4 file:py-2 file:text-sm file:font-semibold file:text-jungle"
           />

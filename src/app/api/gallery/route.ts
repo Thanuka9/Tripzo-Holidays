@@ -1,7 +1,4 @@
 import { NextResponse } from "next/server";
-import { promises as fs } from "fs";
-import path from "path";
-import { randomUUID } from "crypto";
 import { isAdminAuthenticated } from "@/lib/auth";
 import {
   addGalleryImage,
@@ -14,16 +11,7 @@ import {
   updateGalleryImage,
   type GalleryKind,
 } from "@/lib/db";
-
-async function saveUpload(file: File) {
-  const bytes = Buffer.from(await file.arrayBuffer());
-  const ext = path.extname(file.name) || ".jpg";
-  const filename = `${randomUUID()}${ext}`;
-  const dir = path.join(process.cwd(), "public", "uploads", "gallery");
-  await fs.mkdir(dir, { recursive: true });
-  await fs.writeFile(path.join(dir, filename), bytes);
-  return `/uploads/gallery/${filename}`;
-}
+import { savePublicUpload } from "@/lib/storage";
 
 export async function GET() {
   await ensureDefaultHeroSlides();
@@ -38,7 +26,6 @@ export async function POST(req: Request) {
   }
 
   const form = await req.formData();
-  const file = form.get("file");
   const title = String(form.get("title") || "Untitled");
   const caption = String(form.get("caption") || "");
   const place = String(form.get("place") || "");
@@ -48,22 +35,32 @@ export async function POST(req: Request) {
   const kind: GalleryKind =
     kindRaw === "team" ? "team" : kindRaw === "hero" ? "hero" : "general";
 
-  if (!(file instanceof File)) {
+  const files = [
+    ...form.getAll("file"),
+    ...form.getAll("files"),
+  ].filter((f): f is File => f instanceof File && f.size > 0);
+
+  if (files.length === 0) {
     return NextResponse.json({ error: "File required" }, { status: 400 });
   }
 
   try {
-    const src = await saveUpload(file);
-    const image = await addGalleryImage({
-      src,
-      title,
-      caption: caption || undefined,
-      place: place || undefined,
-      people: people || undefined,
-      kind,
-      category: category || (kind === "general" ? "heritage" : undefined),
-    });
-    return NextResponse.json({ image });
+    const images = [];
+    for (const file of files) {
+      const src = await savePublicUpload(file, "gallery");
+      images.push(
+        await addGalleryImage({
+          src,
+          title,
+          caption: caption || undefined,
+          place: place || undefined,
+          people: people || undefined,
+          kind,
+          category: category || (kind === "general" ? "heritage" : undefined),
+        }),
+      );
+    }
+    return NextResponse.json({ image: images[0], images });
   } catch (err) {
     const message =
       err instanceof Error ? err.message : "Upload failed  -  storage may be read-only.";
@@ -152,7 +149,7 @@ export async function PATCH(req: Request) {
   const file = form.get("file");
   try {
     if (file instanceof File && file.size > 0) {
-      patch.src = await saveUpload(file);
+      patch.src = await savePublicUpload(file, "gallery");
     }
     const image = await updateGalleryImage(id, patch);
     if (!image) {

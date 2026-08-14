@@ -1,6 +1,4 @@
 import { NextResponse } from "next/server";
-import { promises as fs } from "fs";
-import path from "path";
 import { randomUUID } from "crypto";
 import { isAdminAuthenticated } from "@/lib/auth";
 import {
@@ -10,16 +8,7 @@ import {
   updateDestinationGallery,
   upsertDestination,
 } from "@/lib/db";
-
-async function saveUpload(file: File, destinationId: string) {
-  const bytes = Buffer.from(await file.arrayBuffer());
-  const ext = path.extname(file.name) || ".jpg";
-  const filename = `${destinationId}-${randomUUID().slice(0, 6)}${ext}`;
-  const dir = path.join(process.cwd(), "public", "uploads", "destinations");
-  await fs.mkdir(dir, { recursive: true });
-  await fs.writeFile(path.join(dir, filename), bytes);
-  return `/uploads/destinations/${filename}`;
-}
+import { savePublicUpload } from "@/lib/storage";
 
 export async function GET() {
   const destinations = await getDestinations();
@@ -71,7 +60,7 @@ export async function POST(req: Request) {
     try {
       const uploaded: string[] = [];
       for (const file of files) {
-        uploaded.push(await saveUpload(file, id));
+        uploaded.push(await savePublicUpload(file, "destinations", id));
       }
       image = uploaded[0] || image;
       gallery = [...uploaded, ...gallery.filter((src) => !uploaded.includes(src))];
@@ -231,7 +220,7 @@ export async function PATCH(req: Request) {
   try {
     const srcs: string[] = [];
     for (const file of files) {
-      srcs.push(await saveUpload(file, id));
+      srcs.push(await savePublicUpload(file, "destinations", id));
     }
     const destination = await addDestinationGalleryImages(id, srcs);
     if (!destination) {

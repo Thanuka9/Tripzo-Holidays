@@ -1,20 +1,8 @@
 import { NextResponse } from "next/server";
-import { promises as fs } from "fs";
-import path from "path";
-import { randomUUID } from "crypto";
 import { isAdminAuthenticated } from "@/lib/auth";
 import { deleteTour, getTours, getTourBySlug, upsertTour } from "@/lib/db";
 import type { Tour, TourDay } from "@/lib/tours";
-
-async function saveUpload(file: File) {
-  const bytes = Buffer.from(await file.arrayBuffer());
-  const ext = path.extname(file.name) || ".jpg";
-  const filename = `tour-${randomUUID().slice(0, 8)}${ext}`;
-  const dir = path.join(process.cwd(), "public", "uploads", "tours");
-  await fs.mkdir(dir, { recursive: true });
-  await fs.writeFile(path.join(dir, filename), bytes);
-  return `/uploads/tours/${filename}`;
-}
+import { savePublicUpload } from "@/lib/storage";
 
 function parseHighlights(raw: string) {
   return raw
@@ -74,7 +62,7 @@ export async function POST(req: Request) {
   let image = String(form.get("existingImage") || existing?.image || "");
   if (file instanceof File && file.size > 0) {
     try {
-      image = await saveUpload(file);
+      image = await savePublicUpload(file, "tours", "tour");
     } catch (err) {
       const message = err instanceof Error ? err.message : "Upload failed";
       return NextResponse.json({ error: message }, { status: 500 });
@@ -172,7 +160,7 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ error: "File required" }, { status: 400 });
   }
   try {
-    const image = await saveUpload(file);
+    const image = await savePublicUpload(file, "tours", "tour");
     const tour = await upsertTour({ ...current, image });
     return NextResponse.json({ tour });
   } catch (err) {

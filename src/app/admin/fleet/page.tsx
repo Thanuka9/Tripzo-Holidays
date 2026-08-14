@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import Image from "next/image";
+import { SiteImage as Image } from "@/components/SiteImage";
 import { useRouter } from "next/navigation";
 import {
   ArrowDown,

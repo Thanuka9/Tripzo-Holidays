@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import { SiteImage as Image } from "@/components/SiteImage";
 import {
   ArrowRight,
   Car,

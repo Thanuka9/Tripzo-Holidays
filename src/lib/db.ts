@@ -7,6 +7,11 @@ import { defaultTours, type Tour } from "./tours";
 import { SITE } from "./constants";
 
 const DATA_DIR = path.join(process.cwd(), "data");
+const memoryCache = new Map<string, unknown>();
+
+function blobEnabled() {
+  return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+}
 
 export type BookingStatus = "new" | "confirmed" | "completed" | "cancelled";
 
@@ -90,34 +95,73 @@ async function ensureDataDir() {
 }
 
 async function readJson<T>(file: string, fallback: T): Promise<T> {
+  if (memoryCache.has(file)) {
+    return memoryCache.get(file) as T;
+  }
+
+  if (blobEnabled()) {
+    try {
+      const { list } = await import("@vercel/blob");
+      const { blobs } = await list({ prefix: `data/${file}`, limit: 8 });
+      const match =
+        blobs.find((b) => b.pathname === `data/${file}`) ||
+        blobs.find((b) => b.pathname.endsWith(`/${file}`));
+      if (match) {
+        const res = await fetch(match.url, { cache: "no-store" });
+        if (res.ok) {
+          const data = (await res.json()) as T;
+          memoryCache.set(file, data);
+          return data;
+        }
+      }
+    } catch {
+      /* fall through to disk / seed */
+    }
+  }
+
   await ensureDataDir();
   const filePath = path.join(DATA_DIR, file);
   try {
     const raw = await fs.readFile(filePath, "utf8");
-    return JSON.parse(raw) as T;
+    const data = JSON.parse(raw) as T;
+    memoryCache.set(file, data);
+    return data;
   } catch {
-    // Seed files when possible; on Vercel the disk is read-only so just use fallback
+    memoryCache.set(file, fallback);
     try {
       await fs.writeFile(filePath, JSON.stringify(fallback, null, 2), "utf8");
     } catch {
-      /* no persistent storage on this host */
+      /* read-only host */
     }
     return fallback;
   }
 }
 
 async function writeJson<T>(file: string, data: T) {
+  memoryCache.set(file, data);
+  const payload = JSON.stringify(data, null, 2);
+
+  if (blobEnabled()) {
+    const { put } = await import("@vercel/blob");
+    await put(`data/${file}`, payload, {
+      access: "public",
+      addRandomSuffix: false,
+      allowOverwrite: true,
+      contentType: "application/json",
+    });
+    return;
+  }
+
   await ensureDataDir();
   try {
-    await fs.writeFile(
-      path.join(DATA_DIR, file),
-      JSON.stringify(data, null, 2),
-      "utf8",
-    );
+    await fs.writeFile(path.join(DATA_DIR, file), payload, "utf8");
   } catch {
-    throw new Error(
-      "File storage is read-only on this host. Use a database for production admin writes.",
-    );
+    if (process.env.VERCEL) {
+      throw new Error(
+        "Admin saves need Vercel Blob. Create a Blob store in the Vercel project, then redeploy.",
+      );
+    }
+    throw new Error("Could not save data to disk.");
   }
 }
 

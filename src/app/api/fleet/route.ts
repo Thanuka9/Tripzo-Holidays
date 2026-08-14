@@ -1,6 +1,4 @@
 import { NextResponse } from "next/server";
-import { promises as fs } from "fs";
-import path from "path";
 import { randomUUID } from "crypto";
 import { isAdminAuthenticated } from "@/lib/auth";
 import {
@@ -11,16 +9,7 @@ import {
   updateFleetGallery,
   upsertFleetVehicle,
 } from "@/lib/db";
-
-async function saveFleetUpload(file: File, vehicleId: string) {
-  const bytes = Buffer.from(await file.arrayBuffer());
-  const ext = path.extname(file.name) || ".jpg";
-  const filename = `${vehicleId}-${randomUUID().slice(0, 6)}${ext}`;
-  const dir = path.join(process.cwd(), "public", "uploads", "fleet");
-  await fs.mkdir(dir, { recursive: true });
-  await fs.writeFile(path.join(dir, filename), bytes);
-  return `/uploads/fleet/${filename}`;
-}
+import { savePublicUpload } from "@/lib/storage";
 
 export async function GET() {
   const fleet = await getFleet();
@@ -57,7 +46,7 @@ export async function POST(req: Request) {
 
   if (file instanceof File && file.size > 0) {
     try {
-      const src = await saveFleetUpload(file, id);
+      const src = await savePublicUpload(file, "fleet", id);
       image = src;
       if (!gallery.includes(src)) gallery = [src, ...gallery];
     } catch (err) {
@@ -203,7 +192,7 @@ export async function PATCH(req: Request) {
   }
 
   try {
-    const src = await saveFleetUpload(file, id);
+    const src = await savePublicUpload(file, "fleet", id);
     const vehicle = await addFleetGalleryImage(id, src);
     if (!vehicle) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });

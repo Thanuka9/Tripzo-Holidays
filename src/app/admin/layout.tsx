@@ -3,6 +3,7 @@ import { isAdminAuthenticated } from "@/lib/auth";
 import { AdminNav } from "@/components/admin/AdminNav";
 import { getContactSettings } from "@/lib/db";
 import { SITE } from "@/lib/constants";
+import { hasBlobStore } from "@/lib/storage";
 
 async function logoutAction() {
   "use server";
@@ -19,6 +20,7 @@ export default async function AdminLayout({
   const authed = await isAdminAuthenticated();
   const contact = authed ? await getContactSettings() : null;
   const siteUrl = contact?.siteUrl || SITE.url;
+  const needsBlob = authed && Boolean(process.env.VERCEL) && !hasBlobStore();
 
   return (
     <div className="flex min-h-screen flex-col bg-[#0f1412] text-zinc-100">
@@ -32,6 +34,13 @@ export default async function AdminLayout({
         </header>
       )}
       <div className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6">
+        {needsBlob ? (
+          <p className="mb-6 rounded-2xl border border-sun/40 bg-sun/10 px-4 py-3 text-sm text-sun">
+            Photo uploads need a Vercel Blob store. Open the Vercel project →
+            Storage → Create Database → Blob, connect it to this project, then
+            redeploy.
+          </p>
+        ) : null}
         {children}
       </div>
     </div>

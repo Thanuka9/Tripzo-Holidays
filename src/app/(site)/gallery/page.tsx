@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Image from "next/image";
+import { SiteImage as Image } from "@/components/SiteImage";
 import { Suspense } from "react";
 import { GalleryShowcase } from "@/components/GalleryShowcase";
 import {

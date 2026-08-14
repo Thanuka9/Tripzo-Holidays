@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
+import { SiteImage as Image } from "@/components/SiteImage";
 import { getTours } from "@/lib/db";
 
 export const metadata: Metadata = {

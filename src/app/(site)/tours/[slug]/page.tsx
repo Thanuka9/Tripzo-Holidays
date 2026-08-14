@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Image from "next/image";
+import { SiteImage as Image } from "@/components/SiteImage";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
